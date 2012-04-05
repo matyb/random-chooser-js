@@ -1,152 +1,112 @@
-function load() {
-
-	if (!window.random_chooser){
-		window.random_chooser = {};
-		window.random_chooser.lists = {};
-		firstLoad();
-	}
-	
-};
-
-function firstLoad(){
-	// initialize logging
-	initConsole();
-
-	// prepare view
-	document.getElementById("addListButton").disabled = true;
-	document.getElementById("addToListButton").disabled = true;
-	reset();
-
-	// attach listeners
-	document.getElementById("value").onkeyup = function() {
-		valueKeyPressed();
+(function () {
+	"use strict";
+	var doc = window.document, random_chooser = {}, console = window.console || {};
+	random_chooser.lists = {};
+	random_chooser.reset = function () {
+		doc.getElementById("listTitle").innerHTML = random_chooser.listTitle() + random_chooser.noListSelected();
+		doc.getElementById("listsTitle").innerHTML = random_chooser.listsTitle() + random_chooser.noListSelected();
+		doc.getElementById("randomButton").disabled = true;
 	};
-	
-	document.getElementById("addListButton").onclick = function(){
-		addList();
+	random_chooser.firstLoad = function () {
+		// initialize logging
+		random_chooser.initConsole();
+		// prepare view
+		doc.getElementById("addListButton").disabled = true;
+		doc.getElementById("addToListButton").disabled = true;
+		random_chooser.reset();
+		// attach listeners
+		doc.getElementById("value").onkeyup = function () {
+			random_chooser.valueKeyPressed();
+		};
+		doc.getElementById("addListButton").onclick = function () {
+			random_chooser.addList();
+		};
+		doc.getElementById("addToListButton").onclick = function () {
+			random_chooser.addToList();
+		};
+		doc.getElementById("randomButton").onclick = function () {
+			random_chooser.randomlySelect();
+		};
 	};
-	
-	document.getElementById("addToListButton").onclick = function(){
-		addToList();
+	random_chooser.initConsole = function () {
+		console.log = console.log || function () {};
+		console.warn = console.warn || function () {};
+		console.error = console.error || function () {};
+		console.info = console.info || function () {};
 	};
-	
-	document.getElementById("randomButton").onclick = function(){
-		randomlySelect();
-	};
-	
-};
-
-function initConsole(){
-	if (!window.console) console = {};
-	console.log = console.log || function(){};
-	console.warn = console.warn || function(){};
-	console.error = console.error || function(){};
-	console.info = console.info || function(){};
-}
-
-function valueKeyPressed() {
-	var value = document.getElementById("value").value.trim();
-	var lists = document.getElementById("lists");
-	var addListButtonDisabled = false;
-	for(var i = 0; i < lists.childNodes.length; i++) {
-		var lineItem = lists.childNodes[i];
-		var lineText = lineItem.innerHTML;
-		if(lineText == value) {
-			addListButtonDisabled = true;
-		}
-	}
-	var addToListButtonDisabled = getSelectedList() == undefined || isValueInSelectedList(value);
-	document.getElementById("addListButton").disabled = addListButtonDisabled || value.length == 0;
-	document.getElementById("addToListButton").disabled = addToListButtonDisabled || value.length == 0;
-}
-
-function getSelectedList(){
-	return window.random_chooser.lists[window.random_chooser.selected_list_title];
-}
-
-function isValueInSelectedList(lineText) {
-	var list = getSelectedList();
-	if(list) {
-		addToListButtonDisabled = false;
-		for(var j = 0; j < list.length; j++) {
-			var listEntry = list[j];
-			if(listEntry == lineText) {
-				return true;
+	random_chooser.valueKeyPressed = function () {
+		var value = doc.getElementById("value").value.trim();
+		var lists = doc.getElementById("lists");
+		var addListButtonDisabled = false;
+		for (var i=0;i<lists.childNodes.length;i++) {
+			var lineItem = lists.childNodes[i];
+			var lineText = lineItem.innerHTML;
+			if (lineText == value) {
+				addListButtonDisabled = true;
 			}
 		}
-	}
-	return false;
-}
-
-
-function enterPressed(){
-	if(!document.getElementById("randomButton").disabled){
-		randomlySelect();
-	}
-	else if(!document.getElementById("addToList").disabled){
-		addToList();
-	}
-	else if(!document.getElementById("addList").disabled){
-		addList();
-	}
-	else{
-		console.info("no buttons enabled");
-	}
-}
-
-function randomlySelect(){
-	window.console.info("randomly selected");
-};
-
-function addList() {
-
-	var lineItem = document.createElement("li");
-	var valueTextBox = document.getElementById("value");
-	var value = valueTextBox.value;
-	lineItem.appendChild(document.createTextNode(value))
-	lineItem.onclick = function() {
-		document.getElementById("listTitle").innerHTML = listTitle() + value;
-		document.getElementById("randomButton").disabled = false;
-		window.random_chooser.selected_list_title = value;
-		document.getElementById("addToListButton").disabled = getSelectedList() == undefined || isValueInSelectedList(valueTextBox.value);
+		var addToListButtonDisabled = random_chooser.getSelectedList() == undefined || random_chooser.isValueInSelectedList(value);
+		doc.getElementById("addListButton").disabled = addListButtonDisabled || value.length == 0;
+		doc.getElementById("addToListButton").disabled = addToListButtonDisabled || value.length == 0;
 	};
-	
-	document.getElementById("lists").appendChild(lineItem);
-	document.getElementById("addListButton").disabled = true;
-	var lists = window.random_chooser.lists;
-	lists[value] = [];
-};
-
-function addToList(){
-	var selectedList = getSelectedList();
-	var value = document.getElementById("value").value;
-	selectedList[selectedList.length] = value;
-	document.getElementById("addToListButton").disabled = true;
-}
-
-function reset() {
-	
-	document.getElementById("listTitle").innerHTML = listTitle() + noListSelected();
-	document.getElementById("listsTitle").innerHTML = listsTitle() + noListSelected();
-	document.getElementById("randomButton").disabled = true;
-	
-};
-
-function listTitle() {
-
-	return "Selected List: ";
-
-};
-
-function listsTitle() {
-
-	return "Lists:";
-
-};
-
-function noListSelected() {
-
-	return "<No List Selected>";
-
-};
-
+	random_chooser.getSelectedList = function () {
+		return random_chooser.lists[random_chooser.selected_list_title];
+	};
+	random_chooser.isValueInSelectedList = function(lineText) {
+		var list = random_chooser.getSelectedList();
+		if (list) {
+			for (var j=0;j<list.length;j++) {
+				var listEntry = list[j];
+				if (listEntry == lineText) {
+					return true;
+				}
+			}
+		}
+		return false;
+	};
+	random_chooser.enterPressed = function () {
+		if (!doc.getElementById("randomButton").disabled) {
+			random_chooser.randomlySelect();
+		} else if (!doc.getElementById("addToList").disabled) {
+			random_chooser.addToList();
+		} else if (!doc.getElementById("addList").disabled) {
+			random_chooser.addList();
+		} else {
+			console.info("no buttons enabled");
+		}
+	};
+	random_chooser.randomlySelect = function () {
+		console.info("randomly selected");
+	};
+	random_chooser.addList = function () {
+		var lineItem = doc.createElement("li");
+		var valueTextBox = doc.getElementById("value");
+		var value = valueTextBox.value;
+		lineItem.appendChild(doc.createTextNode(value))
+		lineItem.onclick = function () {
+			doc.getElementById("listTitle").innerHTML = random_chooser.listTitle() + value;
+			doc.getElementById("randomButton").disabled = false;
+			random_chooser.selected_list_title = value;
+			doc.getElementById("addToListButton").disabled = random_chooser.getSelectedList() == undefined || random_chooser.isValueInSelectedList(valueTextBox.value);
+		};
+		doc.getElementById("lists").appendChild(lineItem);
+		doc.getElementById("addListButton").disabled = true;
+		var lists = random_chooser.lists[value] = [];
+	};
+	random_chooser.addToList = function () {
+		var selectedList = random_chooser.getSelectedList();
+		var value = doc.getElementById("value").value;
+		selectedList[selectedList.length] = value;
+		doc.getElementById("addToListButton").disabled = true;
+	};
+	random_chooser.listTitle = function () {
+		return "Selected List: ";
+	};
+	random_chooser.listsTitle = function () {
+		return "Lists:";
+	};
+	random_chooser.noListSelected = function () {
+		return "<No List Selected>";
+	};
+	random_chooser.firstLoad();
+})();

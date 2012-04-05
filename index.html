@@ -1,9 +1,8 @@
 <html>
 	<head>
-		<script src="chooser.js"></script>
 		<title>Random Chooser</title>
 	</head>
-	<body onload="javascript:load();return false;">
+	<body>
 		<form onsubmit="javascript:enterPressed();return false;">Value: <input type="text" name="value" id="value" />
 			<br />Lists<br />
 			<button type="button" id="addListButton">add list</button>
@@ -15,4 +14,5 @@
 		<h3 id="listsTitle"></h3>
 		<ol id="lists"></ol>
 	</body>
+	<script src="chooser.js"></script>
 </html>
