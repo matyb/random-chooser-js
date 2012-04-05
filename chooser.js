@@ -10,18 +10,14 @@ function load() {
 
 function firstLoad(){
 	// initialize logging
-	if (!window.console) console = {};
-	console.log = console.log || function(){};
-	console.warn = console.warn || function(){};
-	console.error = console.error || function(){};
-	console.info = console.info || function(){};
+	initConsole();
 
 	// prepare view
 	document.getElementById("addListButton").disabled = true;
 	document.getElementById("addToListButton").disabled = true;
 	reset();
 
-	// key listener for enabling add list button
+	// attach listeners
 	document.getElementById("value").onkeyup = function() {
 		valueKeyPressed();
 	};
@@ -40,39 +36,62 @@ function firstLoad(){
 	
 };
 
+function initConsole(){
+	if (!window.console) console = {};
+	console.log = console.log || function(){};
+	console.warn = console.warn || function(){};
+	console.error = console.error || function(){};
+	console.info = console.info || function(){};
+}
 
 function valueKeyPressed() {
 	var value = document.getElementById("value").value.trim();
 	var lists = document.getElementById("lists");
 	var addListButtonDisabled = false;
-	var addToListButtonDisabled = true;
 	for(var i = 0; i < lists.childNodes.length; i++) {
 		var lineItem = lists.childNodes[i];
 		var lineText = lineItem.innerHTML;
 		if(lineText == value) {
 			addListButtonDisabled = true;
 		}
-		var list = window.random_chooser.lists[window.random_chooser.selected_list_title];
-		if(list){
-			addToListButtonDisabled = false;
-			for(var j = 0; j < list.length; j++) {
-				var listEntry = list[j];
-				if(listEntry == value){
-					addToListButtonDisabled = true;
-				}
-			}
-		}
 	}
+	var addToListButtonDisabled = getSelectedList() == undefined || isValueInSelectedList(value);
 	document.getElementById("addListButton").disabled = addListButtonDisabled || value.length == 0;
 	document.getElementById("addToListButton").disabled = addToListButtonDisabled || value.length == 0;
 }
 
+function getSelectedList(){
+	return window.random_chooser.lists[window.random_chooser.selected_list_title];
+}
+
+function isValueInSelectedList(lineText) {
+	var list = getSelectedList();
+	if(list) {
+		addToListButtonDisabled = false;
+		for(var j = 0; j < list.length; j++) {
+			var listEntry = list[j];
+			if(listEntry == lineText) {
+				return true;
+			}
+		}
+	}
+	return false;
+}
+
 
 function enterPressed(){
-	alert("fix this");
-	// if(!document.getElementById("randomButton")).disabled){
-		// addList();
-	// }
+	if(!document.getElementById("randomButton").disabled){
+		randomlySelect();
+	}
+	else if(!document.getElementById("addToList").disabled){
+		addToList();
+	}
+	else if(!document.getElementById("addList").disabled){
+		addList();
+	}
+	else{
+		console.info("no buttons enabled");
+	}
 }
 
 function randomlySelect(){
@@ -89,6 +108,7 @@ function addList() {
 		document.getElementById("listTitle").innerHTML = listTitle() + value;
 		document.getElementById("randomButton").disabled = false;
 		window.random_chooser.selected_list_title = value;
+		document.getElementById("addToListButton").disabled = getSelectedList() == undefined || isValueInSelectedList(valueTextBox.value);
 	};
 	
 	document.getElementById("lists").appendChild(lineItem);
@@ -98,8 +118,7 @@ function addList() {
 };
 
 function addToList(){
-	var lists = window.random_chooser.lists;
-	var selectedList = lists[window.random_chooser.selected_list_title];
+	var selectedList = getSelectedList();
 	var value = document.getElementById("value").value;
 	selectedList[selectedList.length] = value;
 	document.getElementById("addToListButton").disabled = true;
