@@ -1,0 +1,60 @@
+<html>
+	<head>
+		<title>Random Chooser</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="jquery.mobile-1.0.1.min.css" />
+		<script src="jquery-1.6.4.min.js"></script>
+		<script src="jquery.mobile-1.0.1.min.js"></script>
+		<script src="chooser2.js"></script>
+	</head>
+	<body>
+		<div data-role="page" id="firstPage">
+			<div data-role="header">
+				<h1>random chooser</h1>
+			</div>
+			<div data-role="content">
+				<a href="#addListPage"data-role="button" data-rel="dialog" data-transition="pop">Add List</a>
+				<br/>	
+				<ul data-role="listview" data-split-icon="delete" data-split-theme="d" id="lists">
+				</ul>
+			</div>
+			<div data-role="footer">
+				<h1>copyright - meh</h1>
+			</div>
+		</div>
+		<div data-role="page" id="addListPage">
+			<div data-role="header">
+				<h1>add list</h1>
+			</div>
+			<div data-role="content">
+				<form>
+					<div data-role="fieldcontain" class="ui-hide-label">
+						<label for="listName">List Name:</label>
+						<input type="text" name="listName" id="listName" value="" placeholder="List Name"/>
+					</div>
+					<a id="addListOk" href="#firstPage" data-role="button" data-rel="back" data-theme="c">OK</a>
+				</form>
+			</div>
+			<div data-role="footer">
+				<h1>copyright - meh</h1>
+			</div>
+		</div>
+		<div data-role="page" id="viewListPage">
+			<div data-role="header">
+				<h1>add list</h1>
+			</div>
+			<div data-role="content">
+				<form>
+					<div data-role="fieldcontain" class="ui-hide-label">
+						<label for="listName">List Name:</label>
+						<input type="text" name="listName" id="listName" value="" placeholder="List Name"/>
+					</div>
+					<a id="addListOk" href="#firstPage" data-role="button" data-rel="back" data-theme="c">OK</a>
+				</form>
+			</div>
+			<div data-role="footer">
+				<h1>copyright - meh</h1>
+			</div>
+		</div>
+	</body>
+</html>
