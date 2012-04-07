@@ -109,7 +109,7 @@ randomChooser.view = (function () {
 			$('#listItems').append($('<li/>', {}).append(listViewAnchor).append(deleteListAnchor));
 		},
 		drawSelectedList : function (listName, list) {
-			$('#listNameLabel').text(listName);
+			$('#listNameLabel').text("list: "+listName);
 			var i = 0;
 			$('#listItems').empty();
 			list.sort();
@@ -192,6 +192,12 @@ $('#addListPage').live('pageinit', function(event) {
 	addListOk.click(function () {
 		randomChooser.controller.addList( $('#listName').val().trim() );
 	});
+	$("#addListPage").bind('keyup', function(event) {
+		if(event.keyCode == 13  && addListOk[0].className.indexOf('ui-disabled') === -1) {
+			addListOk.click();
+		}
+		return false;
+	});
 });
 $('#addItemPage').live('pageinit', function(event) {
 	var addItemOk = $('#addItemOk');
@@ -207,6 +213,12 @@ $('#addItemPage').live('pageinit', function(event) {
 	addItemOk.click(function () {
 		randomChooser.controller.addItemToSelectedList( $('#itemName').val().trim() );
 	});
+	$("#addItemPage").bind('keyup', function(event) {
+		if(event.keyCode == 13 && addItemOk[0].className.indexOf('ui-disabled') === -1) {
+			addItemOk.click();
+		}
+		return false;
+	});
 });
 $('#viewListPage').live('pageinit', function(event) {
 	$('#random').click(function () {
@@ -217,6 +229,13 @@ $('#viewItemPage').live('pageinit', function(event) {
 	$('#selectAnother').click(function () {
 		randomChooser.controller.selectRandomItem();
 	});
+	$("#viewItemPage").bind('keyup', function(event) {
+		var selectAnother = $('#selectAnother');
+		if(event.keyCode == 13 && selectAnother[0].className.indexOf('ui-disabled') === -1) {
+			selectAnother.click();
+		}
+		return false;
+	});
 });
 $('#viewListPage').live('pageshow', function(event) {
 	randomChooser.controller.enableDisableRandom();
@@ -226,7 +245,13 @@ $('#addListPage').live('pagehide', function(event, ui) {
 	$('#listName').val('');
 	$('#addListOk').addClass('ui-disabled');
 });
+$('#addListPage').live('pageshow', function(event, ui) {
+	$('#listName').focus();
+});
 $('#addItemPage').live('pagehide', function(event, ui) {
 	$('#itemName').val('');
 	$('#addItemOk').addClass('ui-disabled');
+});
+$('#addItemPage').live('pageshow', function(event, ui) {
+	$('#itemName').focus();
 });
