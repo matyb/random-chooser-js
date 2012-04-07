@@ -9,8 +9,8 @@ randomChooser.model = (function () {
 			var list = [];
 			lists[listName] = list;
 		},
-		removeList : function (listName) {
-			lists[listName] = undefined;
+		deleteList : function (listName) {
+			delete lists[listName];
 		},
 		setSelectedList : function (listName) {
 			selectedList = listName;
@@ -21,55 +21,116 @@ randomChooser.model = (function () {
 		isListNameUnique : function (listName) {
 			return isListNameUnique(listName);
 		},
+		isItemNameUniqueInSelectedList : function (itemName) {
+			var i = 0, currentlySelectedList = lists[selectedList];
+			if( currentlySelectedList !== undefined) {
+				for (; i<currentlySelectedList.length; i++) {
+					if (currentlySelectedList[i] === itemName) {
+						return false;
+					}
+				}
+			}
+			return true;
+		},
 		getListNames : function () {
 			var listNames = [], i = undefined, j = 0;
 			for (i in lists) {
 				listNames[j++] = i;
 			}
 			return listNames;
+		},
+		addItem : function (itemName) {
+			var currentlySelectedList = lists[selectedList];
+			currentlySelectedList[currentlySelectedList.length] = itemName;
+		},
+		deleteItem : function (itemName) {
+			var i = 0, list = lists[selectedList], item = undefined;
+			for (; i<list.length; i++) {
+				item = list[i];
+				if (item == itemName) {
+					if(i === 0){
+						list.splice(0,1);
+					}else{
+						list.splice(i,i);
+					}
+				}
+			}
+		},
+		getSelectedListArray : function () {
+			return randomChooser.model.getList(selectedList);
+		},
+		getList : function (listName) {
+			return lists[listName];
 		}
 	};
 })();
 randomChooser.view = (function () {
 	return {
 		redrawLists : function (listNames) {
-			var lineItem = undefined, listName = undefined, listViewAnchor = undefined, deleteListAnchor = undefined, i = 0;
+			var i = 0;
 			$('#lists').empty();
 			listNames.sort();
 			for(; i<listNames.length; i++){
-				// lineItem = document.createElement("li");
-				listName = listNames[i];
-				listViewAnchor = $('<a/>', {
-						'href' : '#viewListPage',
-					    'data-transition': 'slide',
-					    'text': listName
-				});
-				deleteListAnchor = $('<a/>', {
-					    'data-transition': 'slide',
-					    'text': 'Delete List'
-				});
-				deleteListAnchor[0].onclick = function () {
-					randomChooser.controller.deleteList(listName);
-				};
-				listViewAnchor[0].onclick = function () {
-					randomChooser.controller.setSelectedList(listName);
-				};
-				$('#lists').append($('<li/>', {}).append(listViewAnchor).append(deleteListAnchor));
-				// listViewAnchor = document.createElement("a");
-				// listViewAnchor.appendChild(document.createTextNode(listName));
-				// listViewAnchor.onclick = function () {
-					// randomChooser.controller.setSelectedList(value);
-				// };
-				// deleteListAnchor = document.createElement("a");
-				// deleteListAnchor.appendChild(document.createTextNode("Delete List"));
-				// deleteListAnchor.onclick = function () {
-					// randomChooser.controller.deleteList(listName);
-				// };
-				// lineItem.appendChild(listViewAnchor);
-				// lineItem.appendChild(deleteListAnchor);
-				// $("#lists").append(lineItem);
+				randomChooser.view.addList(listNames[i]);
 			}
 			$('#lists').listview('refresh');
+		},
+		addList : function (listName) {
+			var listViewAnchor = undefined, deleteListAnchor = undefined;
+			listViewAnchor = $('<a/>', {
+					'href' : '#viewListPage',
+				    'data-transition': 'slide',
+				    'text': listName
+			});
+			deleteListAnchor = $('<a/>', {
+				    'data-transition': 'slide',
+				    'text': 'Delete List'
+			});
+			deleteListAnchor[0].onclick = function () {
+				randomChooser.controller.deleteList(listName);
+			};
+			listViewAnchor[0].onclick = function () {
+				randomChooser.controller.setSelectedList(listName);
+			};
+			$('#lists').append($('<li/>', {}).append(listViewAnchor).append(deleteListAnchor));
+		},
+		addItem : function (itemName) {
+			var listViewAnchor = undefined, deleteListAnchor = undefined;
+			listViewAnchor = $('<a/>', {
+					'text': itemName
+			});
+			deleteListAnchor = $('<a/>', {
+				    'data-transition': 'slide',
+				    'text': 'Delete List'
+			});
+			deleteListAnchor[0].onclick = function () {
+				randomChooser.controller.deleteItem(itemName);
+			};
+			$('#listItems').append($('<li/>', {}).append(listViewAnchor).append(deleteListAnchor));
+		},
+		drawSelectedList : function (listName, list) {
+			$('#listNameLabel').text(listName);
+			var i = 0;
+			$('#listItems').empty();
+			list.sort();
+			for(; i<list.length; i++){
+				randomChooser.view.addItem(list[i]);
+			}
+			$('#listItems').listview('refresh');
+		},
+		setRandomDisabled : function (disabled) {
+			if(disabled){
+				$('#random').addClass('ui-disabled');
+			}else{
+				$('#random').removeClass('ui-disabled');
+			}
+		},
+		displayItem : function (itemName) {
+			$('#listItems li').each(function (index, element) {
+				if(element.innerText.trim() == itemName){
+					element.css("background-color", "#FF0000");
+				};
+			});
 		}
 	};
 })();
@@ -84,10 +145,36 @@ randomChooser.controller = (function () {
 			return false;
 		},
 		setSelectedList : function (selectedListName) {
-			alert("Selected: " + selectedListName);
+			randomChooser.model.setSelectedList(selectedListName);
+		},
+		drawList : function (listName) {
+			randomChooser.view.drawSelectedList(listName, randomChooser.model.getList(listName));
+		},
+		drawSelectedList : function () {
+			randomChooser.controller.drawList(randomChooser.model.getSelectedList());
 		},
 		deleteList : function (listName) {
-			alert("Delete: " + listName);
+			randomChooser.model.deleteList(listName);
+			randomChooser.view.redrawLists(randomChooser.model.getListNames());
+		},
+		deleteItem : function (itemName) {
+			randomChooser.model.deleteItem(itemName);
+			randomChooser.controller.enableDisableRandom();
+			randomChooser.view.drawSelectedList(randomChooser.model.getSelectedList(), randomChooser.model.getSelectedListArray());
+		},
+		addItemToSelectedList : function (itemName) {
+			randomChooser.model.addItem(itemName);
+			randomChooser.view.drawSelectedList(randomChooser.model.getSelectedList(), randomChooser.model.getSelectedListArray());
+		},
+		enableDisableRandom : function () {
+			randomChooser.view.setRandomDisabled(
+				randomChooser.model.getSelectedList() === undefined ||
+				randomChooser.model.getSelectedListArray().length <= 0);
+		},
+		selectRandomItem : function () {
+			var randomlySelectedItem = randomChooser.model.getSelectedListArray()[
+				Math.floor(Math.random()*randomChooser.model.getSelectedListArray().length)];
+			randomChooser.view.displayItem(randomlySelectedItem);	
 		}
 	};
 })();
@@ -110,7 +197,35 @@ $('#addListPage').live('pageinit', function(event) {
 		randomChooser.controller.addList( $('#listName').val().trim() );
 	});
 });
+$('#addItemPage').live('pageinit', function(event) {
+	var addItemOk = $('#addItemOk');
+	addItemOk.addClass('ui-disabled');
+	$('#itemName').keyup(function (event) {
+		var itemName = event.currentTarget.value.trim();
+		if(itemName.length === 0 || !randomChooser.model.isItemNameUniqueInSelectedList(itemName)) {
+			addItemOk.addClass('ui-disabled');
+		}else{
+			addItemOk.removeClass('ui-disabled');
+		}
+	});
+	addItemOk.click(function () {
+		randomChooser.controller.addItemToSelectedList( $('#itemName').val().trim() );
+	});
+});
+$('#viewListPage').live('pageinit', function(event) {
+	$('#random').click(function () {
+		randomChooser.controller.selectRandomItem();
+	});
+});
+$('#viewListPage').live('pageshow', function(event) {
+	randomChooser.controller.enableDisableRandom();
+	randomChooser.controller.drawSelectedList();
+});
 $('#addListPage').live('pagehide', function(event, ui) {
 	$('#listName').val('');
 	$('#addListOk').addClass('ui-disabled');
+});
+$('#addItemPage').live('pagehide', function(event, ui) {
+	$('#itemName').val('');
+	$('#addItemOk').addClass('ui-disabled');
 });
