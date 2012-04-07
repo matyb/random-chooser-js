@@ -126,11 +126,7 @@ randomChooser.view = (function () {
 			}
 		},
 		displayItem : function (itemName) {
-			$('#listItems li').each(function (index, element) {
-				if(element.innerText.trim() == itemName){
-					element.css("background-color", "#FF0000");
-				};
-			});
+			$('#itemNameLabel').text(itemName);
 		}
 	};
 })();
@@ -214,6 +210,11 @@ $('#addItemPage').live('pageinit', function(event) {
 });
 $('#viewListPage').live('pageinit', function(event) {
 	$('#random').click(function () {
+		randomChooser.controller.selectRandomItem();
+	});
+});
+$('#viewItemPage').live('pageinit', function(event) {
+	$('#selectAnother').click(function () {
 		randomChooser.controller.selectRandomItem();
 	});
 });

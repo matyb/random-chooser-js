@@ -45,7 +45,7 @@
 			</div>
 			<div data-role="content">
 				<a href="#addItemPage" data-role="button" data-rel="dialog" data-transition="pop">Add Item</a>
-				<a data-role="button" data-rel="dialog" data-transition="pop" id="random">Select at Random</a>
+				<a href="#viewItemPage" data-role="button" data-rel="dialog" data-transition="pop" id="random">Select at Random</a>
 				<br/>	
 				<ul data-role="listview" data-split-icon="delete" data-split-theme="d" id="listItems">
 				</ul>
@@ -66,6 +66,18 @@
 					</div>
 					<a id="addItemOk" href="#viewListPage" data-role="button" data-rel="back" data-theme="c">OK</a>
 				</form>
+			</div>
+			<div data-role="footer">
+				<h1>copyright - meh</h1>
+			</div>
+		</div>
+		<div data-role="page" id="viewItemPage">
+			<div data-role="header">
+				<h1>selected:</h1>
+			</div>
+			<div data-role="content">
+				<h1 id="itemNameLabel" align="center"></h1>
+				<a data-role="button" id="selectAnother">Select Another</a>
 			</div>
 			<div data-role="footer">
 				<h1>copyright - meh</h1>
