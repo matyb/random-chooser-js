@@ -1,28 +1,21 @@
 var randomChooser = {};
 randomChooser.model = (function () {
-	var lists = {}, selectedList = undefined;
-	isListNameUnique = function (listName) {
-		return lists[listName] === undefined;
-	}
+	var lists = {}, selectedListName = undefined;
 	return {
 		addList : function (listName) {
-			var list = [];
-			lists[listName] = list;
+			lists[listName] = [];
 		},
 		deleteList : function (listName) {
 			delete lists[listName];
 		},
-		setSelectedList : function (listName) {
-			selectedList = listName;
+		setSelectedListName : function (listName) {
+			selectedListName = listName;
 		},
-		getSelectedList : function () {
-			return selectedList;
-		},
-		isListNameUnique : function (listName) {
-			return isListNameUnique(listName);
+		getSelectedListName : function () {
+			return selectedListName;
 		},
 		isItemNameUniqueInSelectedList : function (itemName) {
-			var i = 0, currentlySelectedList = lists[selectedList];
+			var i = 0, currentlySelectedList = lists[selectedListName];
 			if( currentlySelectedList !== undefined) {
 				for (; i<currentlySelectedList.length; i++) {
 					if (currentlySelectedList[i] === itemName) {
@@ -40,11 +33,11 @@ randomChooser.model = (function () {
 			return listNames;
 		},
 		addItem : function (itemName) {
-			var currentlySelectedList = lists[selectedList];
+			var currentlySelectedList = lists[selectedListName];
 			currentlySelectedList[currentlySelectedList.length] = itemName;
 		},
 		deleteItem : function (itemName) {
-			var i = 0, list = lists[selectedList], item = undefined;
+			var i = 0, list = lists[selectedListName], item = undefined;
 			for (; i<list.length; i++) {
 				item = list[i];
 				if (item == itemName) {
@@ -53,7 +46,7 @@ randomChooser.model = (function () {
 			}
 		},
 		getSelectedListArray : function () {
-			return randomChooser.model.getList(selectedList);
+			return randomChooser.model.getList(selectedListName);
 		},
 		getList : function (listName) {
 			return lists[listName];
@@ -105,10 +98,11 @@ randomChooser.view = (function () {
 			};
 			$('#listItems').append($('<li/>', {}).append(listViewAnchor).append(deleteListAnchor));
 		},
-		drawSelectedList : function (listName, list) {
+		drawList : function (listName, list) {
 			$('#listNameLabel').text("list: "+listName);
 			var i = 0;
 			$('#listItems').empty();
+			$('#listItems').listview('refresh');
 			list.sort();
 			for(; i<list.length; i++){
 				randomChooser.view.addItem(list[i]);
@@ -130,7 +124,7 @@ randomChooser.view = (function () {
 randomChooser.controller = (function () {
 	return {
 		addList : function (listName) {
-			if(randomChooser.model.isListNameUnique(listName)){
+			if(randomChooser.model.getList(listName) === undefined){
 				randomChooser.model.addList(listName);
 				randomChooser.view.redrawLists(randomChooser.model.getListNames());
 				return true;
@@ -138,13 +132,13 @@ randomChooser.controller = (function () {
 			return false;
 		},
 		setSelectedList : function (selectedListName) {
-			randomChooser.model.setSelectedList(selectedListName);
+			randomChooser.model.setSelectedListName(selectedListName);
 		},
 		drawList : function (listName) {
-			randomChooser.view.drawSelectedList(listName, randomChooser.model.getList(listName));
+			randomChooser.view.drawList(listName, randomChooser.model.getList(listName));
 		},
 		drawSelectedList : function () {
-			randomChooser.controller.drawList(randomChooser.model.getSelectedList());
+			randomChooser.controller.drawList(randomChooser.model.getSelectedListName());
 		},
 		deleteList : function (listName) {
 			randomChooser.model.deleteList(listName);
@@ -153,15 +147,15 @@ randomChooser.controller = (function () {
 		deleteItem : function (itemName) {
 			randomChooser.model.deleteItem(itemName);
 			randomChooser.controller.enableDisableRandom();
-			randomChooser.view.drawSelectedList(randomChooser.model.getSelectedList(), randomChooser.model.getSelectedListArray());
+			randomChooser.controller.drawSelectedList();
 		},
 		addItemToSelectedList : function (itemName) {
 			randomChooser.model.addItem(itemName);
-			randomChooser.view.drawSelectedList(randomChooser.model.getSelectedList(), randomChooser.model.getSelectedListArray());
+			randomChooser.controller.drawSelectedList();
 		},
 		enableDisableRandom : function () {
 			randomChooser.view.setRandomDisabled(
-				randomChooser.model.getSelectedList() === undefined ||
+				randomChooser.model.getSelectedListName() === undefined ||
 				randomChooser.model.getSelectedListArray().length <= 0);
 		},
 		selectRandomItem : function () {
@@ -180,7 +174,7 @@ $('#addListPage').live('pageinit', function(event) {
 	addListOk.addClass('ui-disabled');
 	$('#listName').keyup(function (event) {
 		var listName = event.currentTarget.value.trim();
-		if(listName.length === 0 || !randomChooser.model.isListNameUnique(listName)) {
+		if(listName.length === 0 || randomChooser.model.getList(listName) !== undefined) {
 			addListOk.addClass('ui-disabled');
 		}else{
 			addListOk.removeClass('ui-disabled');
@@ -234,7 +228,7 @@ $('#viewItemPage').live('pageinit', function(event) {
 		return false;
 	});
 });
-$('#viewListPage').live('pageshow', function(event) {
+$('#viewListPage').live('pagebeforeshow', function(event) {
 	randomChooser.controller.enableDisableRandom();
 	randomChooser.controller.drawSelectedList();
 });
