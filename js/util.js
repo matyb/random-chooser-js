@@ -75,11 +75,11 @@ randomChooser.attachPageListeners = function () {
 		});
 	});
 	$('#viewItemPage').live('pageinit', function(event) {
-		$('#selectAnother').click(function () {
+		var selectAnother = $('#selectAnother');
+		selectAnother.click(function () {
 			randomChooser.controller.selectRandomItem();
 		});
 		$("#viewItemPage").bind('keyup', function(event) {
-			var selectAnother = $('#selectAnother');
 			if(event.keyCode === 13 && selectAnother[0].className.indexOf('ui-disabled') === -1) {
 				selectAnother.click();
 			}
