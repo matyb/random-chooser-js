@@ -48,11 +48,7 @@ randomChooser.model = (function () {
 			for (; i<list.length; i++) {
 				item = list[i];
 				if (item == itemName) {
-					if(i === 0){
-						list.splice(0,1);
-					}else{
-						list.splice(i,i);
-					}
+					list.splice(i,1);
 				}
 			}
 		},
@@ -67,13 +63,14 @@ randomChooser.model = (function () {
 randomChooser.view = (function () {
 	return {
 		redrawLists : function (listNames) {
-			var i = 0;
-			$('#lists').empty();
+			var i = 0, lists = $('#lists');
+			lists.empty();
+			lists.listview('refresh');
 			listNames.sort();
 			for(; i<listNames.length; i++){
 				randomChooser.view.addList(listNames[i]);
 			}
-			$('#lists').listview('refresh');
+			lists.listview('refresh');
 		},
 		addList : function (listName) {
 			var listViewAnchor = undefined, deleteListAnchor = undefined;
