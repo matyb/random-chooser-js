@@ -1,12 +1,41 @@
 var randomChooser = {};
 randomChooser.model = (function () {
-	var lists = {}, selectedListName = undefined;
+	var lists = undefined, selectedListName = undefined, db = (function() {
+		var isLocalStorageSupported = false;
+		try {
+			isLocalStorageSupported = 'localStorage' in window && window['localStorage'] !== null;
+		} catch (e) {}
+		if (isLocalStorageSupported) {
+			return window.localStorage;
+		} else {
+			return (function () {
+				var storage = {};
+				return {
+					getItem : function(key) {
+						return storage[key];
+					},
+					setItem : function(key, value) {
+						storage[key] = value;
+					}
+				};
+			})();
+		}
+	})();
+	lists = db.getItem('random-chooser-lists');
+	if(lists === null || lists === undefined){
+		lists = {};
+		db.setItem('random-chooser-lists', JSON.stringify(lists));
+	}else{
+		lists = JSON.parse(lists);
+	}
 	return {
 		addList : function (listName) {
 			lists[listName] = [];
+			db.setItem('random-chooser-lists', JSON.stringify(lists));
 		},
 		deleteList : function (listName) {
 			delete lists[listName];
+			db.setItem('random-chooser-lists', JSON.stringify(lists));
 		},
 		setSelectedListName : function (listName) {
 			selectedListName = listName;
@@ -35,6 +64,7 @@ randomChooser.model = (function () {
 		addItem : function (itemName) {
 			var currentlySelectedList = lists[selectedListName];
 			currentlySelectedList[currentlySelectedList.length] = itemName;
+			db.setItem('random-chooser-lists', JSON.stringify(lists));
 		},
 		deleteItem : function (itemName) {
 			var i = 0, list = lists[selectedListName], item = undefined;
@@ -44,6 +74,7 @@ randomChooser.model = (function () {
 					list.splice(i,1);
 				}
 			}
+			db.setItem('random-chooser-lists', JSON.stringify(lists));
 		},
 		getSelectedListArray : function () {
 			return randomChooser.model.getList(selectedListName);
@@ -126,10 +157,13 @@ randomChooser.controller = (function () {
 		addList : function (listName) {
 			if(randomChooser.model.getList(listName) === undefined){
 				randomChooser.model.addList(listName);
-				randomChooser.view.redrawLists(randomChooser.model.getListNames());
+				randomChooser.controller.redrawFirstPage();
 				return true;
 			}
 			return false;
+		},
+		redrawFirstPage : function () {
+			randomChooser.view.redrawLists(randomChooser.model.getListNames());
 		},
 		setSelectedList : function (selectedListName) {
 			randomChooser.model.setSelectedListName(selectedListName);
@@ -168,6 +202,9 @@ randomChooser.controller = (function () {
 
 $(document).ready(function () {
 
+});
+$('#firstPage').live('pageinit', function(event) {
+	randomChooser.controller.redrawFirstPage();
 });
 $('#addListPage').live('pageinit', function(event) {
 	var addListOk = $('#addListOk');
