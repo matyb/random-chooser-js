@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+                    "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <script src="http://code.jquery.com/jquery-latest.js"></script>
+  <link rel="stylesheet" href="qunit.css" type="text/css" media="screen" />
+  <script type="text/javascript" src="qunit.js"></script>
+  <script type="text/javascript" src="../js/localstorage.js"></script>
+
+  <script>
+  $(document).ready(function(){
+    
+test("localStorage is not reimplemented when present", function() {
+  var localStorageMock = {};
+  randomChooser.win = {
+    localStorage : localStorageMock
+  };
+  equal( localStorageMock, randomChooser.createLocalStorage() );
+});
+
+test("localStorage is implemented when not present", function() {
+  var createdLocalStorage, obj = {};
+  randomChooser.win = {};
+  createdLocalStorage = randomChooser.createLocalStorage();
+  ok( createdLocalStorage.hasOwnProperty('getItem') );
+  ok( createdLocalStorage.hasOwnProperty('setItem') );
+});
+
+test("localStorage implementation gets null", function() {
+  var createdLocalStorage, obj = {};
+  randomChooser.win = {};
+  createdLocalStorage = randomChooser.createLocalStorage();
+  equal( null, createdLocalStorage.getItem('meh') );
+});
+
+test("localStorage implementation sets and gets", function() {
+  var createdLocalStorage, obj = {};
+  randomChooser.win = {};
+  createdLocalStorage = randomChooser.createLocalStorage();
+  createdLocalStorage.setItem('meh', obj);
+  equal( obj, createdLocalStorage.getItem('meh') );
+});
+
+  });
+  </script>
+  
+</head>
+<body>
+  <h1 id="qunit-header">Local Storage Tests</h1>
+ <h2 id="qunit-banner"></h2>
+ <div id="qunit-testrunner-toolbar"></div>
+ <h2 id="qunit-userAgent"></h2>
+ <ol id="qunit-tests"></ol>
+ <div id="qunit-fixture"></div>
+</body>
+</html>
