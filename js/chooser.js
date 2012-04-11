@@ -151,6 +151,7 @@ randomChooser.view = {
   askToDeleteItem : function(name) {
     var deleteItem = $('#deleteItem');
     $('#deleteItemLabel').text(name);
+    deleteItem.unbind('click');
     deleteItem.click(function () {
       randomChooser.controller.deleteItem(name);
       $('.ui-dialog').dialog ('close');
@@ -165,6 +166,7 @@ randomChooser.view = {
   askToDeleteList : function(name) {
     var deleteList = $('#deleteList');
     $('#deleteListLabel').text(name);
+    deleteList.unbind('click');
     deleteList.click(function () {
       randomChooser.controller.deleteList(name);
       $('.ui-dialog').dialog ('close');
