@@ -149,14 +149,15 @@ randomChooser.view = {
     $('#itemNameLabel').text(itemName);
   },
   askToDeleteItem : function(name) {
-    var deleteItem = $('#deleteItem');
+    var deleteItem = $('#deleteItem'), deleteItemPage = $('#deleteItemPage');
     $('#deleteItemLabel').text(name);
     deleteItem.unbind('click');
     deleteItem.click(function () {
       randomChooser.controller.deleteItem(name);
       $('.ui-dialog').dialog ('close');
     });
-    $('#deleteItemPage').bind('keyup', function(event) {
+    deleteItemPage.unbind('keyup');
+    deleteItemPage.bind('keyup', function(event) {
       if(event.keyCode === 13) {
         deleteItem.click();
       }
@@ -164,14 +165,15 @@ randomChooser.view = {
     });
   },
   askToDeleteList : function(name) {
-    var deleteList = $('#deleteList');
+    var deleteList = $('#deleteList'), deleteListPage = $('#deleteListPage');
     $('#deleteListLabel').text(name);
     deleteList.unbind('click');
     deleteList.click(function () {
       randomChooser.controller.deleteList(name);
       $('.ui-dialog').dialog ('close');
     });
-    $('#deleteListPage').bind('keyup', function(event) {
+    deleteListPage.unbind('keyup');
+    deleteListPage.bind('keyup', function(event) {
       if(event.keyCode === 13) {
         deleteList.click();
       }
