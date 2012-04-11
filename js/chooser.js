@@ -1,6 +1,6 @@
 var randomChooser;
-if (!randomChooser) {
-	randomChooser = {};
+if(!randomChooser) {
+  randomChooser = {};
 }
 randomChooser.createModel = function() {'use strict';
   var lists, selectedListName, db = randomChooser.localStorage, checkListIsSelected;
@@ -35,7 +35,7 @@ randomChooser.createModel = function() {'use strict';
     },
     isItemNameUniqueInSelectedList : function(itemName) {
       var i, currentlySelectedList = checkListIsSelected();
-      for( i = 0; i < currentlySelectedList.length; i += 1) {
+      for( i = 0; i < currentlySelectedList.length; i += 1 ) {
         if(currentlySelectedList[i] === itemName) {
           return false;
         }
@@ -76,193 +76,229 @@ randomChooser.createModel = function() {'use strict';
 };
 randomChooser.model = randomChooser.createModel();
 randomChooser.view = {
-	redrawLists : function (listNames) {
-		var i = 0, lists = $('#lists');
-		lists.empty();
-		lists.listview('refresh');
-		listNames.sort();
-		for(; i<listNames.length; i++){
-			randomChooser.view.addList(listNames[i]);
-		}
-		lists.listview('refresh');
-	},
-	addList : function (listName) {
-		var listViewAnchor = undefined, deleteListAnchor = undefined;
-		listViewAnchor = $('<a/>', {
-				'href' : '#viewListPage',
-			    'data-transition': 'slide',
-			    'text': listName
-		});
-		deleteListAnchor = $('<a/>', {
-			    'data-transition': 'slide',
-			    'text': 'Delete List'
-		});
-		deleteListAnchor[0].onclick = function () {
-			randomChooser.controller.deleteList(listName);
-		};
-		listViewAnchor[0].onclick = function () {
-			randomChooser.controller.setSelectedList(listName);
-		};
-		$('#lists').append($('<li/>', {}).append(listViewAnchor).append(deleteListAnchor));
-	},
-	addItem : function (itemName) {
-		var listViewAnchor = undefined, deleteListAnchor = undefined;
-		listViewAnchor = $('<a/>', {
-				'text': itemName
-		});
-		deleteListAnchor = $('<a/>', {
-			    'data-transition': 'slide',
-			    'text': 'Delete List'
-		});
-		deleteListAnchor[0].onclick = function () {
-			randomChooser.controller.deleteItem(itemName);
-		};
-		$('#listItems').append($('<li/>', {}).append(listViewAnchor).append(deleteListAnchor));
-	},
-	drawList : function (listName, list) {
-		$('#listNameLabel').text("list: "+listName);
-		var i = 0;
-		$('#listItems').empty();
-		$('#listItems').listview('refresh');
-		list.sort();
-		for(; i<list.length; i++){
-			randomChooser.view.addItem(list[i]);
-		}
-		$('#listItems').listview('refresh');
-	},
-	setRandomDisabled : function (disabled) {
-		if(disabled){
-			$('#random').addClass('ui-disabled');
-		}else{
-			$('#random').removeClass('ui-disabled');
-		}
-	},
-	displayItem : function (itemName) {
-		$('#itemNameLabel').text(itemName);
-	}
+  redrawLists : function(listNames) {
+    var i = 0, lists = $('#lists');
+    lists.empty();
+    lists.listview('refresh');
+    listNames.sort();
+    for(; i < listNames.length; i++) {
+      randomChooser.view.addList(listNames[i]);
+    }
+    lists.listview('refresh');
+  },
+  addList : function(listName) {
+    var listViewAnchor, deleteListAnchor;
+    listViewAnchor = $('<a/>', {
+      'href' : '#viewListPage',
+      'data-transition' : 'slide',
+      'text' : listName
+    });
+    deleteListAnchor = $('<a/>', {
+      'href' : '#deleteListPage',
+      'data-transition' : 'slide',
+      'data-role' : 'button', 
+      'data-rel' : 'dialog', 
+      'data-transition' : 'pop',
+      'text' : 'Delete List'
+    });
+    deleteListAnchor[0].onclick = function() {
+      randomChooser.view.askToDeleteList(listName);
+    };
+    listViewAnchor[0].onclick = function() {
+      randomChooser.controller.setSelectedList(listName);
+    };
+    $('#lists').append($('<li/>', {}).append(listViewAnchor).append(deleteListAnchor));
+  },
+  addItem : function(itemName) {
+    var itemViewAnchor, deleteItemAnchor;
+    itemViewAnchor = $('<a/>', {
+      'text' : itemName
+    });
+    deleteItemAnchor = $('<a/>', {
+      'href' : '#deleteItemPage',
+      'data-transition' : 'slide',
+      'data-role' : 'button', 
+      'data-rel' : 'dialog', 
+      'data-transition' : 'pop',
+      'text' : 'Delete Item'
+    });
+    deleteItemAnchor[0].onclick = function() {
+      randomChooser.view.askToDeleteItem(itemName);
+    };
+    $('#listItems').append($('<li/>', {}).append(itemViewAnchor).append(deleteItemAnchor));
+  },
+  drawList : function(listName, list) {
+    $('#listNameLabel').text("list: " + listName);
+    var i = 0;
+    $('#listItems').empty();
+    $('#listItems').listview('refresh');
+    list.sort();
+    for(; i < list.length; i++) {
+      randomChooser.view.addItem(list[i]);
+    }
+    $('#listItems').listview('refresh');
+  },
+  setRandomDisabled : function(disabled) {
+    if(disabled) {
+      $('#random').addClass('ui-disabled');
+    } else {
+      $('#random').removeClass('ui-disabled');
+    }
+  },
+  displayItem : function(itemName) {
+    $('#itemNameLabel').text(itemName);
+  },
+  askToDeleteItem : function(name) {
+    var deleteItem = $('#deleteItem');
+    $('#deleteItemLabel').text(name);
+    deleteItem.click(function () {
+      randomChooser.controller.deleteItem(name);
+      $('.ui-dialog').dialog ('close');
+    });
+    $('#deleteItemPage').bind('keyup', function(event) {
+      if(event.keyCode === 13) {
+        deleteItem.click();
+      }
+      return false;
+    });
+  },
+  askToDeleteList : function(name) {
+    var deleteList = $('#deleteList');
+    $('#deleteListLabel').text(name);
+    deleteList.click(function () {
+      randomChooser.controller.deleteList(name);
+      $('.ui-dialog').dialog ('close');
+    });
+    $('#deleteListPage').bind('keyup', function(event) {
+      if(event.keyCode === 13) {
+        deleteList.click();
+      }
+      return false;
+    });
+  }
 };
 randomChooser.controller = {
-	addList : function (listName) {
-		if(randomChooser.model.getList(listName) === undefined){
-			randomChooser.model.addList(listName);
-			randomChooser.controller.redrawFirstPage();
-			return true;
-		}
-		return false;
-	},
-	redrawFirstPage : function () {
-		randomChooser.view.redrawLists(randomChooser.model.getListNames());
-	},
-	setSelectedList : function (selectedListName) {
-		randomChooser.model.setSelectedListName(selectedListName);
-	},
-	drawList : function (listName) {
-		randomChooser.view.drawList(listName, randomChooser.model.getList(listName));
-	},
-	drawSelectedList : function () {
-		randomChooser.controller.drawList(randomChooser.model.getSelectedListName());
-	},
-	deleteList : function (listName) {
-		randomChooser.model.deleteList(listName);
-		randomChooser.view.redrawLists(randomChooser.model.getListNames());
-	},
-	deleteItem : function (itemName) {
-		randomChooser.model.deleteItem(itemName);
-		randomChooser.controller.enableDisableRandom();
-		randomChooser.controller.drawSelectedList();
-	},
-	addItemToSelectedList : function (itemName) {
-		randomChooser.model.addItem(itemName);
-		randomChooser.controller.drawSelectedList();
-	},
-	enableDisableRandom : function () {
-		randomChooser.view.setRandomDisabled(
-			randomChooser.model.getSelectedListName() === undefined ||
-			randomChooser.model.getSelectedList().length <= 0);
-	},
-	selectRandomItem : function () {
-		var randomlySelectedItem = randomChooser.model.getSelectedList()[
-			Math.floor(Math.random()*randomChooser.model.getSelectedList().length)];
-		randomChooser.view.displayItem(randomlySelectedItem);	
-	}
+  addList : function(listName) {
+    if(randomChooser.model.getList(listName) === undefined) {
+      randomChooser.model.addList(listName);
+      randomChooser.controller.redrawFirstPage();
+      return true;
+    }
+    return false;
+  },
+  redrawFirstPage : function() {
+    randomChooser.view.redrawLists(randomChooser.model.getListNames());
+  },
+  setSelectedList : function(selectedListName) {
+    randomChooser.model.setSelectedListName(selectedListName);
+  },
+  drawList : function(listName) {
+    randomChooser.view.drawList(listName, randomChooser.model.getList(listName));
+  },
+  drawSelectedList : function() {
+    randomChooser.controller.drawList(randomChooser.model.getSelectedListName());
+  },
+  deleteList : function(listName) {
+    randomChooser.model.deleteList(listName);
+    randomChooser.view.redrawLists(randomChooser.model.getListNames());
+  },
+  deleteItem : function(itemName) {
+    randomChooser.model.deleteItem(itemName);
+    randomChooser.controller.enableDisableRandom();
+    randomChooser.controller.drawSelectedList();
+  },
+  addItemToSelectedList : function(itemName) {
+    randomChooser.model.addItem(itemName);
+    randomChooser.controller.drawSelectedList();
+  },
+  enableDisableRandom : function() {
+    randomChooser.view.setRandomDisabled(randomChooser.model.getSelectedListName() === undefined || randomChooser.model.getSelectedList().length <= 0);
+  },
+  selectRandomItem : function() {
+    var randomlySelectedItem = randomChooser.model.getSelectedList()[Math.floor(Math.random() * randomChooser.model.getSelectedList().length)];
+    randomChooser.view.displayItem(randomlySelectedItem);
+  }
 };
 $('#firstPage').live('pageinit', function(event) {
-	randomChooser.controller.redrawFirstPage();
+  randomChooser.controller.redrawFirstPage();
 });
 $('#addListPage').live('pageinit', function(event) {
-	var addListOk = $('#addListOk');
-	addListOk.addClass('ui-disabled');
-	$('#listName').keyup(function (event) {
-		var listName = event.currentTarget.value.trim();
-		if(listName.length === 0 || randomChooser.model.getList(listName) !== undefined) {
-			addListOk.addClass('ui-disabled');
-		}else{
-			addListOk.removeClass('ui-disabled');
-		}
-	});
-	addListOk.click(function () {
-		randomChooser.controller.addList( $('#listName').val().trim() );
-	});
-	$("#addListPage").bind('keyup', function(event) {
-		if(event.keyCode === 13  && addListOk[0].className.indexOf('ui-disabled') === -1) {
-			addListOk.click();
-		}
-		return false;
-	});
+  var addListOk = $('#addListOk');
+  addListOk.addClass('ui-disabled');
+  $('#listName').keyup(function(event) {
+    var listName = event.currentTarget.value.trim();
+    if(listName.length === 0 || randomChooser.model.getList(listName) !== undefined) {
+      addListOk.addClass('ui-disabled');
+    } else {
+      addListOk.removeClass('ui-disabled');
+    }
+  });
+  addListOk.click(function() {
+    randomChooser.controller.addList($('#listName').val().trim());
+  });
+  $("#addListPage").bind('keyup', function(event) {
+    if(event.keyCode === 13 && addListOk[0].className.indexOf('ui-disabled') === -1) {
+      addListOk.click();
+    }
+    return false;
+  });
 });
 $('#addItemPage').live('pageinit', function(event) {
-	var addItemOk = $('#addItemOk');
-	addItemOk.addClass('ui-disabled');
-	$('#itemName').keyup(function (event) {
-		var itemName = event.currentTarget.value.trim();
-		if(itemName.length === 0 || !randomChooser.model.isItemNameUniqueInSelectedList(itemName)) {
-			addItemOk.addClass('ui-disabled');
-		}else{
-			addItemOk.removeClass('ui-disabled');
-		}
-	});
-	addItemOk.click(function () {
-		randomChooser.controller.addItemToSelectedList( $('#itemName').val().trim() );
-	});
-	$("#addItemPage").bind('keyup', function(event) {
-		if(event.keyCode === 13 && addItemOk[0].className.indexOf('ui-disabled') === -1) {
-			addItemOk.click();
-		}
-		return false;
-	});
+  var addItemOk = $('#addItemOk');
+  addItemOk.addClass('ui-disabled');
+  $('#itemName').keyup(function(event) {
+    var itemName = event.currentTarget.value.trim();
+    if(itemName.length === 0 || !randomChooser.model.isItemNameUniqueInSelectedList(itemName)) {
+      addItemOk.addClass('ui-disabled');
+    } else {
+      addItemOk.removeClass('ui-disabled');
+    }
+  });
+  addItemOk.click(function() {
+    randomChooser.controller.addItemToSelectedList($('#itemName').val().trim());
+  });
+  $("#addItemPage").bind('keyup', function(event) {
+    if(event.keyCode === 13 && addItemOk[0].className.indexOf('ui-disabled') === -1) {
+      addItemOk.click();
+    }
+    return false;
+  });
 });
 $('#viewListPage').live('pageinit', function(event) {
-	$('#random').click(function () {
-		randomChooser.controller.selectRandomItem();
-	});
+  $('#random').click(function() {
+    randomChooser.controller.selectRandomItem();
+  });
 });
 $('#viewItemPage').live('pageinit', function(event) {
-	var selectAnother = $('#selectAnother');
-	selectAnother.click(function () {
-		randomChooser.controller.selectRandomItem();
-	});
-	$("#viewItemPage").bind('keyup', function(event) {
-		if(event.keyCode === 13 && selectAnother[0].className.indexOf('ui-disabled') === -1) {
-			selectAnother.click();
-		}
-		return false;
-	});
+  var selectAnother = $('#selectAnother');
+  selectAnother.click(function() {
+    randomChooser.controller.selectRandomItem();
+  })
+});
+$('#deletePage').live('pageinit', function (event) {
+  
+});
+$("#viewItemPage").bind('keyup', function(event) {
+  if(event.keyCode === 13 && selectAnother[0].className.indexOf('ui-disabled') === -1) {
+    selectAnother.click();
+  }
+  return false;
 });
 $('#viewListPage').live('pagebeforeshow', function(event) {
-	randomChooser.controller.enableDisableRandom();
-	randomChooser.controller.drawSelectedList();
+  randomChooser.controller.enableDisableRandom();
+  randomChooser.controller.drawSelectedList();
 });
 $('#addListPage').live('pagehide', function(event, ui) {
-	$('#listName').val('');
-	$('#addListOk').addClass('ui-disabled');
+  $('#listName').val('');
+  $('#addListOk').addClass('ui-disabled');
 });
 $('#addListPage').live('pageshow', function(event, ui) {
-	$('#listName').focus();
+  $('#listName').focus();
 });
 $('#addItemPage').live('pagehide', function(event, ui) {
-	$('#itemName').val('');
-	$('#addItemOk').addClass('ui-disabled');
+  $('#itemName').val('');
+  $('#addItemOk').addClass('ui-disabled');
 });
 $('#addItemPage').live('pageshow', function(event, ui) {
-	$('#itemName').focus();
+  $('#itemName').focus();
 });
