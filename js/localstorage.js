@@ -3,12 +3,14 @@ if (!randomChooser) {
 	randomChooser = {};
 }
 randomChooser.win = window;
-randomChooser.alarm = window.alert;
+randomChooser.alarm = function(text) {
+  window.alert(text);
+};
 randomChooser.createLocalStorage = function () {
   var isLocalStorageSupported = false;
   try {
     isLocalStorageSupported = 'localStorage' in randomChooser.win && randomChooser.win['localStorage'] !== null;
-    randomChooser.win['localStorage'].setItem('random-chooser-saveable-test', 'success');
+    randomChooser.win['localStorage'].setItem('random-chooser-saveable-test', 'success'); //test mutability - safari throws in private mode
     if(randomChooser.win['localStorage'].removeItem){ // not used by rest of application
       randomChooser.win['localStorage'].removeItem('random-chooser-saveable-test', 'success');
     }
