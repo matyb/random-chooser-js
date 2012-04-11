@@ -2,20 +2,41 @@
                     "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-  <script src="http://code.jquery.com/jquery-latest.js"></script>
   <link rel="stylesheet" href="qunit.css" type="text/css" media="screen" />
+  <script type="text/javascript" src="../js/jquery-1.6.4.min.js"></script>
   <script type="text/javascript" src="qunit.js"></script>
   <script type="text/javascript" src="../js/localstorage.js"></script>
 
   <script>
   $(document).ready(function(){
-    
+QUnit.testStart = function (name) {
+  randomChooser.alarmCalledWith = undefined;
+  randomChooser.alarm = function(text) {
+    randomChooser.alarmCalledWith = text;
+  };
+};
 test("localStorage is not reimplemented when present", function() {
-  var localStorageMock = {};
+  var localStorageMock = {
+    setItem : function (key, value) {} //do nothing - prevents exception
+  };
   randomChooser.win = {
     localStorage : localStorageMock
   };
-  equal( localStorageMock, randomChooser.createLocalStorage() );
+  equal( randomChooser.createLocalStorage(), localStorageMock );
+});
+
+test("localStorage warning when private browsing restricts mutability of datastore", function() {
+  var localStorageMock = {
+    setItem : function (key, value) {
+      throw 'No access to local storage';
+    } 
+  };
+  randomChooser.win = {
+    localStorage : localStorageMock
+  };
+  equal( randomChooser.alarmCalledWith, undefined );
+  randomChooser.createLocalStorage();
+  equal( randomChooser.alarmCalledWith, "Random Chooser cannot save lists, you may have private browsing enabled." );
 });
 
 test("localStorage is implemented when not present", function() {
@@ -30,7 +51,7 @@ test("localStorage implementation gets null", function() {
   var createdLocalStorage, obj = {};
   randomChooser.win = {};
   createdLocalStorage = randomChooser.createLocalStorage();
-  equal( null, createdLocalStorage.getItem('meh') );
+  equal( createdLocalStorage.getItem('meh'), null );
 });
 
 test("localStorage implementation sets and gets", function() {
@@ -38,7 +59,7 @@ test("localStorage implementation sets and gets", function() {
   randomChooser.win = {};
   createdLocalStorage = randomChooser.createLocalStorage();
   createdLocalStorage.setItem('meh', obj);
-  equal( obj, createdLocalStorage.getItem('meh') );
+  equal( createdLocalStorage.getItem('meh'), obj );
 });
 
   });
