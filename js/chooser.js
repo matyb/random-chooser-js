@@ -277,16 +277,16 @@ $('#viewItemPage').live('pageinit', function(event) {
   var selectAnother = $('#selectAnother');
   selectAnother.click(function() {
     randomChooser.controller.selectRandomItem();
-  })
+  });
+  $("#viewItemPage").bind('keyup', function(event) {
+    if(event.keyCode === 13 && selectAnother[0].className.indexOf('ui-disabled') === -1) {
+      selectAnother.click();
+    }
+    return false;
+  });
 });
 $('#deletePage').live('pageinit', function (event) {
   
-});
-$("#viewItemPage").bind('keyup', function(event) {
-  if(event.keyCode === 13 && selectAnother[0].className.indexOf('ui-disabled') === -1) {
-    selectAnother.click();
-  }
-  return false;
 });
 $('#viewListPage').live('pagebeforeshow', function(event) {
   randomChooser.controller.enableDisableRandom();
