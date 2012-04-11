@@ -1,0 +1,1 @@
+A simple list of lists, which may be selected from at random. Uses HTML5 local storage for persistence, and works on most any browser except Mobile Firefox on Android, and desktop IE variations thanks to jQuery mobile.
