@@ -154,7 +154,7 @@ randomChooser.view = {
     deleteItem.unbind('click');
     deleteItem.click(function () {
       randomChooser.controller.deleteItem(name);
-      $('.ui-dialog').dialog ('close');
+      $('#deleteItemPage').dialog ('close');
     });
     deleteItemPage.unbind('keyup');
     deleteItemPage.bind('keyup', function(event) {
@@ -170,7 +170,7 @@ randomChooser.view = {
     deleteList.unbind('click');
     deleteList.click(function () {
       randomChooser.controller.deleteList(name);
-      $('.ui-dialog').dialog ('close');
+      $('#deleteListPage').dialog ('close');
     });
     deleteListPage.unbind('keyup');
     deleteListPage.bind('keyup', function(event) {
