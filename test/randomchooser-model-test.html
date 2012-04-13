@@ -26,24 +26,21 @@ QUnit.testStart = function (name) {
   })();
 };
 module("Model");
-test("saves new random-chooser-lists object if not found", function() {
+test("saves new random-chooser-lists object if not found", 2, function() {
   equal( randomChooser.localStorage.getItem('random-chooser-lists'), null);
   randomChooser.createModel();
   equal( randomChooser.localStorage.getItem('random-chooser-lists'), "{}");
 });
-test("retrieves existing random-chooser-lists", function() {
-  var invoked = false;
+test("retrieves existing random-chooser-lists", 1, function() {
   randomChooser.localStorage = {
     getItem : function (key) {
       equal ('random-chooser-lists', key);
-      invoked = true; // need to know assertion was hit
     },
     setItem : function (){} // not testing this here, just added to avoid exception
   };
-  randomChooser.createModel();
-  ok ( invoked );  
+  randomChooser.createModel();  
 });
-test("addList adds a List to localStorage", function() {
+test("addList adds a List to localStorage", 2, function() {
   var listName = 'listName', model;
   model = randomChooser.createModel(); 
   // ensure db for app is empty
@@ -52,60 +49,60 @@ test("addList adds a List to localStorage", function() {
   model.addList(listName);
   equal ( randomChooser.localStorage.getItem('random-chooser-lists'), '{\"' + listName + '\":[]}');
 });
-test("deleteList deletes a List from localStorage", function() {
+test("deleteList deletes a List from localStorage", 1, function() {
   var model = randomChooser.createModel(), listName = 'listName';
   randomChooser.localStorage.setItem('random-chooser-lists', JSON.stringify( { listName : [] } ));
   model.deleteList(listName);
   deepEqual ( randomChooser.localStorage.getItem('random-chooser-lists'), "{}");
 });
-test("getSelectedListName returns undefined", function() {
+test("getSelectedListName returns undefined", 1, function() {
   var model = randomChooser.createModel();
   equal ( model.getSelectedListName(), undefined );
 });
-test("setSelectedListName sets the name of the selected list", function() {
+test("setSelectedListName sets the name of the selected list", 1, function() {
   var model = randomChooser.createModel(), listName = 'listName';
   model.setSelectedListName(listName);
   equal ( model.getSelectedListName(), listName );
 });
-test("isItemNameUniqueInSelectedList raise exception if no list selected", function() {
+test("isItemNameUniqueInSelectedList raise exception if no list selected", 1, function() {
   var model = randomChooser.createModel();
   raises ( function () {
     model.isItemNameUniqueInSelectedList('listName');
   },"Invalid list is selected: 'undefined'", 'Expected an exception, result is not valid when no list selected' );
 });
-test("isItemNameUniqueInSelectedList - is NOT unique", function() {
+test("isItemNameUniqueInSelectedList - is NOT unique", 1, function() {
   var model, listName = 'listName', itemName = '123';
   randomChooser.localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[\"' + itemName + '\"]}' );
   model = randomChooser.createModel();
   model.setSelectedListName( listName );
   ok ( !model.isItemNameUniqueInSelectedList(itemName) );
 });
-test("isItemNameUniqueInSelectedList - IS unique", function() {
+test("isItemNameUniqueInSelectedList - IS unique", 1, function() {
   var model, listName = 'listName';
   randomChooser.localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[]}' );
   model = randomChooser.createModel();
   model.setSelectedListName( listName );
   ok ( model.isItemNameUniqueInSelectedList('123') );
 });
-test("getListNames - empty", function() {
+test("getListNames - empty", 1, function() {
   var model, listName = 'listName';
   randomChooser.localStorage.setItem('random-chooser-lists', '{}' );
   model = randomChooser.createModel();
   deepEqual ( [], model.getListNames() );
 });
-test("getListNames - exist", function() {
+test("getListNames - exist", 1, function() {
   var model, listName = 'listName';
   randomChooser.localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[]}' );
   model = randomChooser.createModel();
   deepEqual ( [listName], model.getListNames() );
 });
-test("addItem - raises exception if invoked with no selected list", function() {
+test("addItem - raises exception if invoked with no selected list", 1, function() {
   var model = randomChooser.createModel();
   raises ( function () {
     model.addItem('listName');
   },"Invalid list is selected: 'undefined'", 'Expected an exception, result is not valid when no list selected' );
 });
-test("addItem - adds an item to currently selected list", function() {
+test("addItem - adds an item to currently selected list", 1, function() {
   var model, listName = 'listName', itemName = '123';
   randomChooser.localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[]}' );
   model = randomChooser.createModel();
@@ -113,13 +110,13 @@ test("addItem - adds an item to currently selected list", function() {
   model.addItem(itemName);
   equal ( randomChooser.localStorage.getItem('random-chooser-lists'), '{\"' + listName + '\":[\"' + itemName + '\"]}' );
 });
-test("deleteItem - raises exception if invoked with no selected list", function() {
+test("deleteItem - raises exception if invoked with no selected list", 1, function() {
   var model = randomChooser.createModel();
   raises ( function () {
     model.deleteItem('listName');
   },"Invalid list is selected: 'undefined'", 'Expected an exception, result is not valid when no list selected' );
 });
-test("deleteItem - deletes an item from currently selected list", function() {
+test("deleteItem - deletes an item from currently selected list", 1, function() {
   var model, listName = 'listName', itemName = '123';
   randomChooser.localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[\"' + itemName + '\"]}' );
   model = randomChooser.createModel();
@@ -127,27 +124,20 @@ test("deleteItem - deletes an item from currently selected list", function() {
   model.deleteItem(itemName);
   equal ( randomChooser.localStorage.getItem('random-chooser-lists'), '{\"' + listName + '\":[]}');
 });
-test("getSelectedList - undefined when no list selected", function() {
+test("getSelectedList - undefined when no list selected", 1, function() {
   equal ( randomChooser.createModel().getSelectedList(), undefined );
 });
-test("getSelectedList - is the list selected", function() {
+test("getSelectedList - is the list selected", 1, function() {
   var listName = 'listName', itemName = '123';
   randomChooser.localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[\"' + itemName + '\"]}' );
   randomChooser.model = randomChooser.createModel();
   randomChooser.model.setSelectedListName(listName);
   deepEqual ( randomChooser.model.getSelectedList(), [itemName] );
 });
-test("getList - undefined when no list selected", function() {
+test("getList - undefined when no list selected", 1, function() {
   equal ( randomChooser.createModel().getList('some list name'), undefined );
 });
-test("getList - is the list for the provided name", function() {
-  var listName = 'listName', itemName = '123';
-  randomChooser.localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[\"' + itemName + '\"]}' );
-  deepEqual ( randomChooser.createModel().getList(listName), [itemName] );
-});
-
-module("View");
-test("getList - is the list for the provided name", function() {
+test("getList - is the list for the provided name", 1, function() {
   var listName = 'listName', itemName = '123';
   randomChooser.localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[\"' + itemName + '\"]}' );
   deepEqual ( randomChooser.createModel().getList(listName), [itemName] );
@@ -162,61 +152,6 @@ test("getList - is the list for the provided name", function() {
  <div id="qunit-testrunner-toolbar"></div>
  <h2 id="qunit-userAgent"></h2>
  <ol id="qunit-tests"></ol>
- <div id="qunit-fixture"><div data-role="page" id="firstPage">
-      <div data-role="header">
-        <h1>random chooser</h1>
-      </div>
-      <div data-role="content">
-        <a href="#addListPage"data-role="button" data-rel="dialog" data-transition="pop">Add List</a>
-        <br/> 
-        <ul data-role="listview" data-split-icon="delete" data-split-theme="d" id="lists">
-        </ul>
-      </div>
-    </div>
-    <div data-role="page" id="addListPage">
-      <div data-role="header">
-        <h1>add list</h1>
-      </div>
-      <div data-role="content">
-        <div data-role="fieldcontain" class="ui-hide-label">
-          <label for="listName">List Name:</label>
-          <input type="text" name="listName" id="listName" value="" placeholder="List Name"/>
-        </div>
-        <a id="addListOk" href="#firstPage" data-role="button" data-rel="back" data-theme="c">OK</a>
-      </div>
-    </div>
-    <div data-role="page" id="viewListPage">
-      <div data-role="header">
-        <h1 id="listNameLabel"></h1>
-      </div>
-      <div data-role="content">
-        <a href="#addItemPage" data-role="button" data-rel="dialog" data-transition="pop">Add Item</a>
-        <a href="#viewItemPage" data-role="button" data-rel="dialog" data-transition="pop" id="random">Select at Random</a>
-        <br/> 
-        <ul data-role="listview" data-split-icon="delete" data-split-theme="d" id="listItems">
-        </ul>
-      </div>
-    </div>
-    <div data-role="page" id="addItemPage">
-      <div data-role="header">
-        <h1>add item</h1>
-      </div>
-      <div data-role="content">
-        <div data-role="fieldcontain" class="ui-hide-label">
-          <label for="itemName">Item Name:</label>
-          <input type="text" name="itemName" id="itemName" value="" placeholder="Item Name"/>
-        </div>
-        <a id="addItemOk" href="#viewListPage" data-role="button" data-rel="back" data-theme="c">OK</a>
-      </div>
-    </div>
-    <div data-role="page" id="viewItemPage">
-      <div data-role="header">
-        <h1>selected</h1>
-      </div>
-      <div data-role="content">
-        <h1 id="itemNameLabel" align="center"></h1>
-        <a data-role="button" id="selectAnother">Select Another</a>
-      </div>
-    </div></div>
+ <div id="qunit-fixture"></div>
 </body>
 </html>

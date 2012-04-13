@@ -75,112 +75,115 @@ randomChooser.createModel = function() {'use strict';
   };
 };
 randomChooser.model = randomChooser.createModel();
-randomChooser.view = {
-  redrawLists : function(listNames) {
-    var i = 0, lists = $('#lists');
-    lists.empty();
-    lists.listview('refresh');
-    listNames.sort();
-    for(; i < listNames.length; i++) {
-      randomChooser.view.addList(listNames[i]);
-    }
-    lists.listview('refresh');
-  },
-  addList : function(listName) {
-    var listViewAnchor, deleteListAnchor;
-    listViewAnchor = $('<a/>', {
-      'href' : '#viewListPage',
-      'data-transition' : 'slide',
-      'text' : listName
-    });
-    deleteListAnchor = $('<a/>', {
-      'href' : '#deleteListPage',
-      'data-transition' : 'slide',
-      'data-role' : 'button', 
-      'data-rel' : 'dialog', 
-      'data-transition' : 'pop',
-      'text' : 'Delete List'
-    });
-    deleteListAnchor[0].onclick = function() {
-      randomChooser.view.askToDeleteList(listName);
-    };
-    listViewAnchor[0].onclick = function() {
-      randomChooser.controller.setSelectedList(listName);
-    };
-    $('#lists').append($('<li/>', {}).append(listViewAnchor).append(deleteListAnchor));
-  },
-  addItem : function(itemName) {
-    var itemViewAnchor, deleteItemAnchor;
-    itemViewAnchor = $('<a/>', {
-      'text' : itemName
-    });
-    deleteItemAnchor = $('<a/>', {
-      'href' : '#deleteItemPage',
-      'data-transition' : 'slide',
-      'data-role' : 'button', 
-      'data-rel' : 'dialog', 
-      'data-transition' : 'pop',
-      'text' : 'Delete Item'
-    });
-    deleteItemAnchor[0].onclick = function() {
-      randomChooser.view.askToDeleteItem(itemName);
-    };
-    $('#listItems').append($('<li/>', {}).append(itemViewAnchor).append(deleteItemAnchor));
-  },
-  drawList : function(listName, list) {
-    $('#listNameLabel').text("list: " + listName);
-    var i = 0;
-    $('#listItems').empty();
-    $('#listItems').listview('refresh');
-    list.sort();
-    for(; i < list.length; i++) {
-      randomChooser.view.addItem(list[i]);
-    }
-    $('#listItems').listview('refresh');
-  },
-  setRandomDisabled : function(disabled) {
-    if(disabled) {
-      $('#random').addClass('ui-disabled');
-    } else {
-      $('#random').removeClass('ui-disabled');
-    }
-  },
-  displayItem : function(itemName) {
-    $('#itemNameLabel').text(itemName);
-  },
-  askToDeleteItem : function(name) {
-    var deleteItem = $('#deleteItem'), deleteItemPage = $('#deleteItemPage');
-    $('#deleteItemLabel').text(name);
-    deleteItem.unbind('click');
-    deleteItem.click(function () {
-      randomChooser.controller.deleteItem(name);
-      $('#deleteItemPage').dialog ('close');
-    });
-    deleteItemPage.unbind('keyup');
-    deleteItemPage.bind('keyup', function(event) {
-      if(event.keyCode === 13) {
-        deleteItem.click();
+randomChooser.createView = function () {
+  return {
+    redrawLists : function(listNames) {
+      var i = 0, lists = $('#lists');
+      lists.empty();
+      lists.listview('refresh');
+      listNames.sort();
+      for(; i < listNames.length; i++) {
+        randomChooser.view.addList(listNames[i]);
       }
-      return false;
-    });
-  },
-  askToDeleteList : function(name) {
-    var deleteList = $('#deleteList'), deleteListPage = $('#deleteListPage');
-    $('#deleteListLabel').text(name);
-    deleteList.unbind('click');
-    deleteList.click(function () {
-      randomChooser.controller.deleteList(name);
-      $('#deleteListPage').dialog ('close');
-    });
-    deleteListPage.unbind('keyup');
-    deleteListPage.bind('keyup', function(event) {
-      if(event.keyCode === 13) {
-        deleteList.click();
+      lists.listview('refresh');
+    },
+    addList : function(listName) {
+      var listViewAnchor, deleteListAnchor;
+      listViewAnchor = $('<a/>', {
+        'href' : '#viewListPage',
+        'data-transition' : 'slide',
+        'text' : listName
+      });
+      deleteListAnchor = $('<a/>', {
+        'href' : '#deleteListPage',
+        'data-transition' : 'slide',
+        'data-role' : 'button', 
+        'data-rel' : 'dialog', 
+        'data-transition' : 'pop',
+        'text' : 'Delete List'
+      });
+      deleteListAnchor[0].onclick = function() {
+        randomChooser.view.askToDeleteList(listName);
+      };
+      listViewAnchor[0].onclick = function() {
+        randomChooser.controller.setSelectedList(listName);
+      };
+      $('#lists').append($('<li/>', {}).append(listViewAnchor).append(deleteListAnchor));
+    },
+    addItem : function(itemName) {
+      var itemViewAnchor, deleteItemAnchor;
+      itemViewAnchor = $('<a/>', {
+        'text' : itemName
+      });
+      deleteItemAnchor = $('<a/>', {
+        'href' : '#deleteItemPage',
+        'data-transition' : 'slide',
+        'data-role' : 'button', 
+        'data-rel' : 'dialog', 
+        'data-transition' : 'pop',
+        'text' : 'Delete Item'
+      });
+      deleteItemAnchor[0].onclick = function() {
+        randomChooser.view.askToDeleteItem(itemName);
+      };
+      $('#listItems').append($('<li/>', {}).append(itemViewAnchor).append(deleteItemAnchor));
+    },
+    drawList : function(listName, list) {
+      $('#listNameLabel').text("list: " + listName);
+      var i = 0;
+      $('#listItems').empty();
+      $('#listItems').listview('refresh');
+      list.sort();
+      for(; i < list.length; i++) {
+        randomChooser.view.addItem(list[i]);
       }
-      return false;
-    });
-  }
+      $('#listItems').listview('refresh');
+    },
+    setRandomDisabled : function(disabled) {
+      if(disabled) {
+        $('#random').addClass('ui-disabled');
+      } else {
+        $('#random').removeClass('ui-disabled');
+      }
+    },
+    displayItem : function(itemName) {
+      $('#itemNameLabel').text(itemName);
+    },
+    askToDeleteItem : function(name) {
+      var deleteItem = $('#deleteItem'), deleteItemPage = $('#deleteItemPage');
+      $('#deleteItemLabel').text(name);
+      deleteItem.unbind('click');
+      deleteItem.click(function () {
+        randomChooser.controller.deleteItem(name);
+        $('#deleteItemPage').dialog ('close');
+      });
+      deleteItemPage.unbind('keyup');
+      deleteItemPage.bind('keyup', function(event) {
+        if(event.keyCode === 13) {
+          deleteItem.click();
+        }
+        return false;
+      });
+    },
+    askToDeleteList : function(name) {
+      var deleteList = $('#deleteList'), deleteListPage = $('#deleteListPage');
+      $('#deleteListLabel').text(name);
+      deleteList.unbind('click');
+      deleteList.click(function () {
+        randomChooser.controller.deleteList(name);
+        $('#deleteListPage').dialog ('close');
+      });
+      deleteListPage.unbind('keyup');
+      deleteListPage.bind('keyup', function(event) {
+        if(event.keyCode === 13) {
+          deleteList.click();
+        }
+        return false;
+      });
+    }
+  };
 };
+randomChooser.view = randomChooser.createView();
 randomChooser.controller = {
   addList : function(listName) {
     if(randomChooser.model.getList(listName) === undefined) {
