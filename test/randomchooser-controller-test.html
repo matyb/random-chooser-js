@@ -1,0 +1,179 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+                    "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Random Chooser Tests</title>
+  <link rel="stylesheet" href="qunit.css" type="text/css" media="screen" />
+  <script type="text/javascript" src="../js/json2.js"></script>
+  <script type="text/javascript" src="../js/jquery-1.6.4.min.js"></script>
+  <script type="text/javascript" src="../js/localstorage.js"></script>
+  <script type="text/javascript" src="../js/chooser.js"></script>
+  <script type="text/javascript" src="qunit.js"></script>
+
+  <script>
+  $(document).ready(function(){
+QUnit.testStart = function (name) {
+  randomChooser.view = {};
+  randomChooser.model = {};
+  randomChooser.controller = randomChooser.createController();
+};
+module("Controller");
+test("addList - adds unique list", 4, function() {
+  var listName = 'meh';
+  randomChooser.model.getList = function (name) {
+    equal( name, listName );
+    return undefined;
+  };
+  randomChooser.model.addList = function (name) {
+    equal( name, listName);
+  };
+  randomChooser.controller.redrawFirstPage = function () {
+    ok(true); // ensure invoked via test count in test invocation
+  };
+  ok ( randomChooser.controller.addList( listName ) );
+});
+test("addList - doesn't add existing list", 2, function() {
+  var listName = 'meh';
+  randomChooser.model.getList = function (name) {
+    equal( name, listName );
+    return [];
+  };
+  ok ( !randomChooser.controller.addList( listName ) );
+});
+test("redrawFistPage - redraws first page", 2, function() {
+  var listNames = ['meh'];
+  randomChooser.model.getListNames = function () {
+    ok(true); // ensure invoked via test count in test invocation
+    return listNames;
+  };
+  randomChooser.view.redrawLists = function (lists) {
+    equal ( lists, listNames );
+  };
+  randomChooser.controller.redrawFirstPage();
+});
+test("setSelectedList - coordinates setting selected list", 1, function() {
+  var listName = 'meh';
+  randomChooser.model.setSelectedListName = function (name) {
+    equal( name, listName );
+  };
+  randomChooser.controller.setSelectedList(listName);
+});
+test("drawList - draws passed in list", 3, function() {
+  var listName = 'meh', list = ['1'];
+  randomChooser.model.getList = function (name) {
+    equal( name, listName );
+    return list;
+  };
+  randomChooser.view.drawList = function (name, listItems){
+    equal( name, listName );
+    equal( listItems, list );
+  };
+  randomChooser.controller.drawList(listName);
+});
+test("drawSelectedList - invokes drawList with selected list", 2, function() {
+  var listName = 'meh';
+  randomChooser.model.getSelectedListName = function () {
+    ok(true); // ensures invoked via test count in test invocation
+    return listName;
+  };
+  randomChooser.controller.drawList = function (name){
+    equal( name, listName );
+  };
+  randomChooser.controller.drawSelectedList();
+});
+test("deleteList - deletes and redraws list view", 3, function() {
+  var listName = 'meh', lists = ['1'];
+  randomChooser.model.deleteList = function (name) {
+    equal( name, listName );
+  };
+  randomChooser.model.getListNames = function () {
+    ok(true); // ensure invoked via test count in test invocation
+    return lists;
+  };
+  randomChooser.view.redrawLists = function (listNames){
+    equal( lists, listNames );
+  };
+  randomChooser.controller.deleteList(listName);
+});
+test("deleteItem - deletes and redraws item view", 2, function() {
+  var itemName = 'meh', list = ['1'];
+  randomChooser.model.deleteItem = function (name) {
+    equal( name, itemName );
+  };
+  randomChooser.controller.drawSelectedList = function (){
+    ok(true); // ensure invoked via test count in test invocation
+  };
+  randomChooser.controller.enableDisableRandom = function (){};
+  randomChooser.controller.deleteItem(itemName);
+});
+test("deleteItem - checks to disable random button on deletion", 1, function() {
+  var itemName = 'meh', list = [];
+  randomChooser.model.deleteItem = function (name) {};
+  randomChooser.controller.drawSelectedList = function (){};
+  randomChooser.controller.enableDisableRandom = function (){
+    ok(true); // ensure invoked via test count in test invocation
+  };
+  randomChooser.controller.deleteItem(itemName);
+});
+test("deleteItem - checks to disable random button on deletion", 1, function() {
+  randomChooser.model.deleteItem = function (name) {};
+  randomChooser.controller.drawSelectedList = function (){};
+  randomChooser.controller.enableDisableRandom = function (){
+    ok(true); // ensure invoked via test count in test invocation
+  };
+  randomChooser.controller.deleteItem('itemName');
+});
+test("addItemToSelectedList - adds item, redraws list", 2, function() {
+  var itemName = 'meh', list = [];
+  randomChooser.model.addItem = function (name) {
+    equal( name, itemName );
+  };
+  randomChooser.controller.drawSelectedList = function (){
+    ok(true); // ensure invoked via test count in test invocation
+  };
+  randomChooser.controller.addItemToSelectedList(itemName);
+});
+test("enableDisableRandom - disables when no list selected", 1, function() {
+  randomChooser.model.getSelectedListName = function () {
+    return undefined;
+  };
+  randomChooser.view.setRandomDisabled = function (disabled) {
+    ok(disabled);
+  };
+  randomChooser.controller.enableDisableRandom();
+});
+test("enableDisableRandom - disables when list is empty", 1, function() {
+  randomChooser.model.getSelectedListName = function () {
+    return '1';
+  };
+  randomChooser.model.getSelectedList = function () {
+    return [];
+  };
+  randomChooser.view.setRandomDisabled = function (disabled) {
+    ok(disabled);
+  };
+  randomChooser.controller.enableDisableRandom();
+});
+test("selectRandomItem - selects and displays item from selected list", 1, function() {
+  randomChooser.model.getSelectedList = function () {
+    return ['1'];
+  };
+  randomChooser.view.displayItem = function (arg) {
+    equal( arg, '1' );
+  };
+  randomChooser.controller.selectRandomItem();
+});
+//randomChooser.view.setRandomDisabled(randomChooser.model.getSelectedListName() === undefined || randomChooser.model.getSelectedList().length <= 0);
+  });
+  </script>
+  
+</head>
+<body>
+  <h1 id="qunit-header">Random Chooser Tests</h1>
+ <h2 id="qunit-banner"></h2>
+ <div id="qunit-testrunner-toolbar"></div>
+ <h2 id="qunit-userAgent"></h2>
+ <ol id="qunit-tests"></ol>
+ <div id="qunit-fixture"></div>
+</body>
+</html>

@@ -190,48 +190,51 @@ randomChooser.createView = function () {
   };
 };
 randomChooser.view = randomChooser.createView();
-randomChooser.controller = {
-  addList : function(listName) {
-    if(randomChooser.model.getList(listName) === undefined) {
-      randomChooser.model.addList(listName);
-      randomChooser.controller.redrawFirstPage();
-      return true;
+randomChooser.createController = function () {
+  return {
+    addList : function(listName) {
+      if(randomChooser.model.getList(listName) === undefined) {
+        randomChooser.model.addList(listName);
+        randomChooser.controller.redrawFirstPage();
+        return true;
+      }
+      return false;
+    },
+    redrawFirstPage : function() {
+      randomChooser.view.redrawLists(randomChooser.model.getListNames());
+    },
+    setSelectedList : function(selectedListName) {
+      randomChooser.model.setSelectedListName(selectedListName);
+    },
+    drawList : function(listName) {
+      randomChooser.view.drawList(listName, randomChooser.model.getList(listName));
+    },
+    drawSelectedList : function() {
+      randomChooser.controller.drawList(randomChooser.model.getSelectedListName());
+    },
+    deleteList : function(listName) {
+      randomChooser.model.deleteList(listName);
+      randomChooser.view.redrawLists(randomChooser.model.getListNames());
+    },
+    deleteItem : function(itemName) {
+      randomChooser.model.deleteItem(itemName);
+      randomChooser.controller.enableDisableRandom();
+      randomChooser.controller.drawSelectedList();
+    },
+    addItemToSelectedList : function(itemName) {
+      randomChooser.model.addItem(itemName);
+      randomChooser.controller.drawSelectedList();
+    },
+    enableDisableRandom : function() {
+      randomChooser.view.setRandomDisabled(randomChooser.model.getSelectedListName() === undefined || randomChooser.model.getSelectedList().length <= 0);
+    },
+    selectRandomItem : function() {
+      var randomlySelectedItem = randomChooser.model.getSelectedList()[Math.floor(Math.random() * randomChooser.model.getSelectedList().length)];
+      randomChooser.view.displayItem(randomlySelectedItem);
     }
-    return false;
-  },
-  redrawFirstPage : function() {
-    randomChooser.view.redrawLists(randomChooser.model.getListNames());
-  },
-  setSelectedList : function(selectedListName) {
-    randomChooser.model.setSelectedListName(selectedListName);
-  },
-  drawList : function(listName) {
-    randomChooser.view.drawList(listName, randomChooser.model.getList(listName));
-  },
-  drawSelectedList : function() {
-    randomChooser.controller.drawList(randomChooser.model.getSelectedListName());
-  },
-  deleteList : function(listName) {
-    randomChooser.model.deleteList(listName);
-    randomChooser.view.redrawLists(randomChooser.model.getListNames());
-  },
-  deleteItem : function(itemName) {
-    randomChooser.model.deleteItem(itemName);
-    randomChooser.controller.enableDisableRandom();
-    randomChooser.controller.drawSelectedList();
-  },
-  addItemToSelectedList : function(itemName) {
-    randomChooser.model.addItem(itemName);
-    randomChooser.controller.drawSelectedList();
-  },
-  enableDisableRandom : function() {
-    randomChooser.view.setRandomDisabled(randomChooser.model.getSelectedListName() === undefined || randomChooser.model.getSelectedList().length <= 0);
-  },
-  selectRandomItem : function() {
-    var randomlySelectedItem = randomChooser.model.getSelectedList()[Math.floor(Math.random() * randomChooser.model.getSelectedList().length)];
-    randomChooser.view.displayItem(randomlySelectedItem);
-  }
+  };
 };
+randomChooser.controller = randomChooser.createController();
 $('#firstPage').live('pageinit', function(event) {
   randomChooser.controller.redrawFirstPage();
 });
