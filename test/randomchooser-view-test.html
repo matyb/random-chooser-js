@@ -4,8 +4,8 @@
 <head>
   <title>Random Chooser Tests</title>
   <link rel="stylesheet" href="qunit.css" type="text/css" media="screen" />
-  <script type="text/javascript" src="../js/json2.js"></script>
   <script type="text/javascript" src="../js/jquery-1.6.4.min.js"></script>
+  <script type="text/javascript" src="../js/json2.js"></script>
   <script type="text/javascript" src="../js/localstorage.js"></script>
   <script type="text/javascript" src="../js/chooser.js"></script>
   <script type="text/javascript" src="qunit.js"></script>
@@ -22,9 +22,9 @@ $(document).ready(function(){
   test("redrawLists - draws list for each name in array", 2, function() {
     var lists = $('#lists');
     lists.constructor.prototype.listview = function (refresh) {};
-    equal( $('#lists').children().length, 0);
+    equal( lists.children().length, 0);
     randomChooser.createView().redrawLists(['1','2']);
-    equal( $('#lists').children().length, 2);
+    equal( lists.children().length, 2);
   });
   test("redrawLists - erases list first", 2, function() {
     var lists = $('#lists');
@@ -137,7 +137,101 @@ $(document).ready(function(){
     randomChooser.createView().drawList('1', []);
     equal( $('#listNameLabel').text(), 'list: 1');
   });
-  listNameLabel
+  test("drawList - draws item for each name in array", 2, function() {
+    var list = $('#listItems');
+    list.constructor.prototype.listview = function (refresh) {};
+    equal( list.children().length, 0);
+    randomChooser.createView().drawList('1', ['1','2']);
+    equal( list.children().length, 2);
+  });
+  test("drawList - erases list first", 2, function() {
+    var list = $('#listItems');
+    list.constructor.prototype.listview = function (refresh) {
+      equal (list.children().length, 0);
+      list.constructor.prototype.listview = function (refresh) {
+        equal (list.children().length, 2);
+      };
+    };
+    randomChooser.view.drawList('1', ['1','2']);
+  });
+  test("drawList - undefined list goes to first page (refresh of item view w/ no list)", 2, function() {
+    var list = $('#listItems');
+    list.constructor.prototype.listview = function (refresh) {};
+    $.mobile = {
+      changePage : function(changeTo, properties) {
+        equal( changeTo, '#firstPage' );
+        ok( properties.reverse );
+      }
+    };
+    randomChooser.view.drawList(undefined, undefined);
+  });
+  test("setRandomDisabled - disabled == true", 2, function() {
+    var random = $('#random');
+    random.removeClass('ui-disabled');
+    equal( random.hasClass('ui-disabled'), false);
+    randomChooser.view.setRandomDisabled(true);
+    ok( random.hasClass('ui-disabled'));
+  });
+  test("setRandomDisabled - disabled == false", 2, function() {
+    var random = $('#random');
+    random.addClass('ui-disabled');
+    ok( random.hasClass('ui-disabled'));
+    randomChooser.view.setRandomDisabled(false);
+    equal(random.hasClass('ui-disabled'), false);
+  });
+  test("displayItem - sets item name)", 2, function() {
+    var itemNameLabel = $('#itemNameLabel'), itemName = 'meh';
+    itemNameLabel.text("");
+    equal ("", itemNameLabel.text());
+    randomChooser.view.displayItem(itemName);
+    equal (itemName, itemNameLabel.text());
+  });
+  test("askToDeleteList - click handler deletes list", 1, function() {
+    var deleteList = $('#deleteList');
+    randomChooser.controller.deleteList = function (listName) {
+      equal ( listName, 'meh' );
+    };
+    $('#deleteListPage').constructor.prototype.dialog = function (){};
+    randomChooser.createView().askToDeleteList('meh');
+    deleteList.click();
+  });
+  test("askToDeleteList - enter invokes click handler", 1, function() {
+    var deleteListPage = $('#deleteListPage'), press;
+    randomChooser.controller.deleteList = function (itemName) {};
+    $('#deleteListPage').constructor.prototype.dialog = function (){};
+    randomChooser.createView().askToDeleteList('meh');
+    $('#deleteList').click(function () {
+      ok(true); // ensure invoked via test count in test invocation
+    });
+    press = jQuery.Event("keyup");
+    press.which = 13;
+    press.keyCode = 13;
+    deleteListPage.trigger('focus');
+    deleteListPage.trigger(press);
+  });
+  test("askToDeleteItem - click handler deletes item", 1, function() {
+    var deleteItem = $('#deleteItem');
+    randomChooser.controller.deleteItem = function (itemName) {
+      equal ( itemName, 'meh' );
+    };
+    $('#deleteItemPage').constructor.prototype.dialog = function (){};
+    randomChooser.createView().askToDeleteItem('meh');
+    deleteItem.click();
+  });
+  test("askToDeleteItem - enter invokes click handler", 1, function() {
+    var deleteItemPage = $('#deleteItemPage'), press;
+    randomChooser.controller.deleteItem = function (itemName) {};
+    $('#deleteItemPage').constructor.prototype.dialog = function (){};
+    randomChooser.createView().askToDeleteItem('meh');
+    $('#deleteItem').click(function () {
+      ok(true); // ensure invoked via test count in test invocation
+    });
+    press = jQuery.Event("keyup");
+    press.which = 13;
+    press.keyCode = 13;
+    deleteItemPage.trigger('focus');
+    deleteItemPage.trigger(press);
+  });
 });
   </script>
   
@@ -203,6 +297,24 @@ $(document).ready(function(){
       <div data-role="content">
         <h1 id="itemNameLabel" align="center"></h1>
         <a data-role="button" id="selectAnother">Select Another</a>
+      </div>
+    </div>
+    <div data-role="page" id="deleteListPage">
+      <div data-role="header">
+        <h1>really delete?</h1>
+      </div>
+      <div data-role="content">
+        <h1 id="deleteListLabel" align="center"></h1>
+        <a data-role="button" id="deleteList">Yes</a>
+      </div>
+    </div>
+    <div data-role="page" id="deleteItemPage">
+      <div data-role="header">
+        <h1>really delete?</h1>
+      </div>
+      <div data-role="content">
+        <h1 id="deleteItemLabel" align="center"></h1>
+        <a data-role="button" id="deleteItem">Yes</a>
       </div>
     </div>
  </div>

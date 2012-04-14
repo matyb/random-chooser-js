@@ -129,12 +129,18 @@ randomChooser.createView = function () {
       $('#listItems').append($('<li/>', {}).append(itemViewAnchor).append(deleteItemAnchor));
     },
     drawList : function(listName, list) {
+      var i;
       $('#listNameLabel').text("list: " + listName);
-      var i = 0;
       $('#listItems').empty();
       $('#listItems').listview('refresh');
+      if(list === undefined){ // probably a page refresh - go back to first page
+        $.mobile.changePage("#firstPage", {
+          reverse: true
+        });
+        return false;
+      }
       list.sort();
-      for(; i < list.length; i++) {
+      for(i = 0; i < list.length; i++) {
         randomChooser.view.addItem(list[i]);
       }
       $('#listItems').listview('refresh');
