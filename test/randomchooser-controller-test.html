@@ -40,14 +40,15 @@ test("addList - doesn't add existing list", 2, function() {
   };
   ok ( !randomChooser.controller.addList( listName ) );
 });
-test("redrawFistPage - redraws first page", 2, function() {
-  var listNames = ['meh'];
+test("redrawFistPage - redraws first page", 3, function() {
+  var lists = ['meh'];
   randomChooser.model.getListNames = function () {
     ok(true); // ensure invoked via test count in test invocation
-    return listNames;
+    return lists;
   };
-  randomChooser.view.redrawLists = function (lists) {
-    equal ( lists, listNames );
+  randomChooser.view.redrawLists = function (localLists) {
+    equal ( lists.length, localLists.length );
+    equal ( lists[0], localLists[0].name );
   };
   randomChooser.controller.redrawFirstPage();
 });
@@ -58,17 +59,30 @@ test("setSelectedList - coordinates setting selected list", 1, function() {
   };
   randomChooser.controller.setSelectedList(listName);
 });
-test("drawList - draws passed in list", 3, function() {
+test("drawList - draws passed in list", 4, function() {
   var listName = 'meh', list = ['1'];
   randomChooser.model.getList = function (name) {
     equal( name, listName );
     return list;
   };
   randomChooser.view.drawList = function (name, listItems){
-    equal( name, listName );
-    equal( listItems, list );
+    equal( listName, name );
+    equal( list.length, listItems.length );
+    equal( list[0], listItems[0].name );
   };
   randomChooser.controller.drawList(listName);
+});
+test("drawList - undefined list goes to first page (refresh of item view w/ no list)", 3, function() {
+  $.mobile = {
+    changePage : function(changeTo, properties) {
+      equal( changeTo, '#firstPage' );
+      ok( properties.reverse );
+    }
+  };
+  randomChooser.model.getList = function (listName) {
+    equal( undefined, listName );
+  };
+  randomChooser.controller.drawList(undefined);
 });
 test("drawSelectedList - invokes drawList with selected list", 2, function() {
   var listName = 'meh';
@@ -81,7 +95,7 @@ test("drawSelectedList - invokes drawList with selected list", 2, function() {
   };
   randomChooser.controller.drawSelectedList();
 });
-test("deleteList - deletes and redraws list view", 3, function() {
+test("deleteList - deletes and redraws list view", 4, function() {
   var listName = 'meh', lists = ['1'];
   randomChooser.model.deleteList = function (name) {
     equal( name, listName );
@@ -91,7 +105,8 @@ test("deleteList - deletes and redraws list view", 3, function() {
     return lists;
   };
   randomChooser.view.redrawLists = function (listNames){
-    equal( lists, listNames );
+    equal( lists.length, listNames.length);
+    equal( lists[0], listNames[0].name );
   };
   randomChooser.controller.deleteList(listName);
 });

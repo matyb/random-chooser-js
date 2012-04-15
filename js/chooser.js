@@ -77,17 +77,16 @@ randomChooser.createModel = function() {'use strict';
 randomChooser.model = randomChooser.createModel();
 randomChooser.createView = function () {
   return {
-    redrawLists : function(listNames) {
+    redrawLists : function(list) {
       var i = 0, lists = $('#lists');
       lists.empty();
       lists.listview('refresh');
-      listNames.sort();
-      for(; i < listNames.length; i++) {
-        randomChooser.view.addList(listNames[i]);
+      for(; i < list.length; i++) {
+        randomChooser.view.addList(list[i].name, list[i].deleteClick, list[i].viewClick);
       }
       lists.listview('refresh');
     },
-    addList : function(listName) {
+    addList : function(listName, deleteClick, viewClick) {
       var listViewAnchor, deleteListAnchor;
       listViewAnchor = $('<a/>', {
         'href' : '#viewListPage',
@@ -102,15 +101,11 @@ randomChooser.createView = function () {
         'data-transition' : 'pop',
         'text' : 'Delete List'
       });
-      deleteListAnchor[0].onclick = function() {
-        randomChooser.view.askToDeleteList(listName);
-      };
-      listViewAnchor[0].onclick = function() {
-        randomChooser.controller.setSelectedList(listName);
-      };
+      deleteListAnchor[0].onclick = deleteClick;
+      listViewAnchor[0].onclick = viewClick;
       $('#lists').append($('<li/>', {}).append(listViewAnchor).append(deleteListAnchor));
     },
-    addItem : function(itemName) {
+    addItem : function(itemName, deleteClick) {
       var itemViewAnchor, deleteItemAnchor;
       itemViewAnchor = $('<a/>', {
         'text' : itemName
@@ -123,9 +118,7 @@ randomChooser.createView = function () {
         'data-transition' : 'pop',
         'text' : 'Delete Item'
       });
-      deleteItemAnchor[0].onclick = function() {
-        randomChooser.view.askToDeleteItem(itemName);
-      };
+      deleteItemAnchor[0].onclick = deleteClick;
       $('#listItems').append($('<li/>', {}).append(itemViewAnchor).append(deleteItemAnchor));
     },
     drawList : function(listName, list) {
@@ -133,15 +126,9 @@ randomChooser.createView = function () {
       $('#listNameLabel').text("list: " + listName);
       $('#listItems').empty();
       $('#listItems').listview('refresh');
-      if(list === undefined){ // probably a page refresh - go back to first page
-        $.mobile.changePage("#firstPage", {
-          reverse: true
-        });
-        return false;
-      }
       list.sort();
       for(i = 0; i < list.length; i++) {
-        randomChooser.view.addItem(list[i]);
+        randomChooser.view.addItem(list[i].name, list[i].deleteClick);
       }
       $('#listItems').listview('refresh');
     },
@@ -155,12 +142,12 @@ randomChooser.createView = function () {
     displayItem : function(itemName) {
       $('#itemNameLabel').text(itemName);
     },
-    askToDeleteItem : function(name) {
+    askToDeleteItem : function(name, deleteItemClick) {
       var deleteItem = $('#deleteItem'), deleteItemPage = $('#deleteItemPage');
       $('#deleteItemLabel').text(name);
       deleteItem.unbind('click');
+      deleteItem.click(deleteItemClick);
       deleteItem.click(function () {
-        randomChooser.controller.deleteItem(name);
         $('#deleteItemPage').dialog ('close');
       });
       deleteItemPage.unbind('keyup');
@@ -171,12 +158,12 @@ randomChooser.createView = function () {
         return false;
       });
     },
-    askToDeleteList : function(name) {
+    askToDeleteList : function(name, deleteListClick) {
       var deleteList = $('#deleteList'), deleteListPage = $('#deleteListPage');
       $('#deleteListLabel').text(name);
       deleteList.unbind('click');
+      deleteList.click(deleteListClick);
       deleteList.click(function () {
-        randomChooser.controller.deleteList(name);
         $('#deleteListPage').dialog ('close');
       });
       deleteListPage.unbind('keyup');
@@ -201,20 +188,59 @@ randomChooser.createController = function () {
       return false;
     },
     redrawFirstPage : function() {
-      randomChooser.view.redrawLists(randomChooser.model.getListNames());
+      var lists = [], i, listNames = randomChooser.model.getListNames();
+      listNames.sort();
+      for (i = 0; i < listNames.length; i += 1) {
+        (function () {
+          var listName = listNames[i]; 
+          lists.push({
+            name : listName,
+            deleteClick : function() {
+              randomChooser.view.askToDeleteList(listName, function(){
+                randomChooser.controller.deleteList(listName);
+              });
+            },
+            viewClick : function() {
+              randomChooser.controller.setSelectedList(listName);
+            } 
+          });
+        }());
+      }
+      randomChooser.view.redrawLists(lists);
     },
     setSelectedList : function(selectedListName) {
       randomChooser.model.setSelectedListName(selectedListName);
     },
     drawList : function(listName) {
-      randomChooser.view.drawList(listName, randomChooser.model.getList(listName));
+      var list = [], listItems = randomChooser.model.getList(listName), i;
+      if(listItems === undefined){ // probably a page refresh - go back to first page
+        $.mobile.changePage("#firstPage", {
+          reverse: true
+        });
+        return false;
+      }
+      listItems.sort();
+      for (i = 0; i < listItems.length; i += 1) {
+        (function () {
+          var item = listItems[i];
+          list.push({
+            name : item,
+            deleteClick : function () {
+              randomChooser.view.askToDeleteItem(item, function () {
+                randomChooser.controller.deleteItem(item);
+              });
+            }
+          });
+        }());
+      }
+      randomChooser.view.drawList(listName, list);
     },
     drawSelectedList : function() {
       randomChooser.controller.drawList(randomChooser.model.getSelectedListName());
     },
     deleteList : function(listName) {
       randomChooser.model.deleteList(listName);
-      randomChooser.view.redrawLists(randomChooser.model.getListNames());
+      randomChooser.controller.redrawFirstPage();
     },
     deleteItem : function(itemName) {
       randomChooser.model.deleteItem(itemName);

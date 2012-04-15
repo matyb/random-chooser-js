@@ -62,26 +62,24 @@ $(document).ready(function(){
   });
   test("addList - first anchor views when clicked", 2, function() {
     var lists = $('#lists'), viewAnchor;
-    randomChooser.controller = {
-      setSelectedList : function (listName) {
-        equal( listName, '1' );
-      }
-    };
     lists.empty();
-    randomChooser.view.addList('1'); 
+    randomChooser.view.addList('1', function(){
+      throw "Should not have tried to delete";
+    }, function () {
+      ok(true);
+    }); 
     viewAnchor = lists.children()[0].childNodes[0];
     equal( viewAnchor.text, '1');
     viewAnchor.onclick();
   });
   test("addList - second anchor asks to delete when clicked", 2, function() {
     var lists = $('#lists'), deleteAnchor;
-    randomChooser.view = {
-      askToDeleteList : function (listName) {
-        equal( listName, '1');
-      }
-    };
     lists.empty();
-    randomChooser.createView().addList('1'); 
+    randomChooser.createView().addList('1', function(){
+      ok(true);
+    }, function () {
+      throw "Should not have tried to view";
+    });  
     deleteAnchor = lists.children()[0].childNodes[1];
     equal( deleteAnchor.text, 'Delete List');
     deleteAnchor.onclick();
@@ -119,13 +117,10 @@ $(document).ready(function(){
   });
   test("addItem - second anchor asks to delete when clicked", 2, function() {
     var listItems = $('#listItems'), deleteAnchor;
-    randomChooser.view = {
-      askToDeleteItem : function (listName) {
-        equal( listName, '1');
-      }
-    };
     listItems.empty();
-    randomChooser.createView().addItem('1'); 
+    randomChooser.createView().addItem('1', function () {
+      ok(true);
+    }); 
     deleteAnchor = listItems.children()[0].childNodes[1];
     equal( deleteAnchor.text, 'Delete Item');
     deleteAnchor.onclick();
@@ -154,17 +149,6 @@ $(document).ready(function(){
     };
     randomChooser.view.drawList('1', ['1','2']);
   });
-  test("drawList - undefined list goes to first page (refresh of item view w/ no list)", 2, function() {
-    var list = $('#listItems');
-    list.constructor.prototype.listview = function (refresh) {};
-    $.mobile = {
-      changePage : function(changeTo, properties) {
-        equal( changeTo, '#firstPage' );
-        ok( properties.reverse );
-      }
-    };
-    randomChooser.view.drawList(undefined, undefined);
-  });
   test("setRandomDisabled - disabled == true", 2, function() {
     var random = $('#random');
     random.removeClass('ui-disabled');
@@ -186,14 +170,15 @@ $(document).ready(function(){
     randomChooser.view.displayItem(itemName);
     equal (itemName, itemNameLabel.text());
   });
-  test("askToDeleteList - click handler deletes list", 1, function() {
-    var deleteList = $('#deleteList');
-    randomChooser.controller.deleteList = function (listName) {
-      equal ( listName, 'meh' );
-    };
+  test("askToDeleteList - click handler deletes list", 2, function() {
+    var deleteList = $('#deleteList'), invoked = false;
     $('#deleteListPage').constructor.prototype.dialog = function (){};
-    randomChooser.createView().askToDeleteList('meh');
+    randomChooser.createView().askToDeleteList('meh', function ( list ) {
+      invoked = true;
+    }, function () {throw "shouldn't have tried to view";});
+    ok(!invoked);
     deleteList.click();
+    ok(invoked);
   });
   test("askToDeleteList - enter invokes click handler", 1, function() {
     var deleteListPage = $('#deleteListPage'), press;
@@ -209,14 +194,15 @@ $(document).ready(function(){
     deleteListPage.trigger('focus');
     deleteListPage.trigger(press);
   });
-  test("askToDeleteItem - click handler deletes item", 1, function() {
-    var deleteItem = $('#deleteItem');
-    randomChooser.controller.deleteItem = function (itemName) {
-      equal ( itemName, 'meh' );
-    };
+  test("askToDeleteItem - click handler deletes item", 2, function() {
+    var deleteItem = $('#deleteItem'), invoked = false;
     $('#deleteItemPage').constructor.prototype.dialog = function (){};
-    randomChooser.createView().askToDeleteItem('meh');
+    randomChooser.createView().askToDeleteItem('meh', function () {
+      invoked = true;
+    });
+    ok(!invoked);
     deleteItem.click();
+    ok(invoked);
   });
   test("askToDeleteItem - enter invokes click handler", 1, function() {
     var deleteItemPage = $('#deleteItemPage'), press;
