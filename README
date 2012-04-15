@@ -1,1 +1,1 @@
-An application for when you wish chance to select an item at random from a list. Uses HTML5 local storage for persistence, and works on most any browser except Mobile Firefox on Android, and desktop IE variations thanks to jQuery mobile.
+For when you wish to select an item at random from a list. Uses HTML5 local storage for persistence.
