@@ -16,33 +16,6 @@ QUnit.testStart = function (name) {
   randomChooser.controller = randomChooser.createController( {} , {} );
 };
 module("Controller");
-test("addList - adds unique list", 5, function() {
-  var listName = 'meh', model = {}, view = {};
-  model.getList = function (name) {
-    equal( name, listName );
-    return undefined;
-  };
-  model.getListNames = function () {
-    ok(true);
-    return [];
-  };
-  model.addList = function (name) {
-    equal( name, listName);
-  };
-  view.redrawLists = function (lists) {
-    deepEqual( lists, []);
-  };
-  ok ( randomChooser.createController( model , view ).addList( listName ) );
-});
-test("addList - doesn't add existing list", 2, function() {
-  var listName = 'meh', model = {
-    getList : function (name) {
-      equal( name, listName );
-      return [];
-    }
-  };
-  ok ( !randomChooser.createController(model, {}).addList( listName ) );
-});
 test("redrawFistPage - redraws first page", 3, function() {
   var lists = ['meh'], model = {}, view = {};
   model.getListNames = function () {
@@ -54,41 +27,6 @@ test("redrawFistPage - redraws first page", 3, function() {
     equal ( lists[0], localLists[0].name );
   };
   randomChooser.createController(model, view).redrawFirstPage();
-});
-test("setSelectedList - coordinates setting selected list", 1, function() {
-  var listName = 'meh', model = {
-    setSelectedListName : function (name) {
-      equal( name, listName );
-    }
-  };
-  randomChooser.createController(model, {}).setSelectedList(listName);
-});
-test("drawList - draws passed in list", 4, function() {
-  var listName = 'meh', list = ['1'], model = {}, view = {};
-  model.getList = function (name) {
-    equal( name, listName );
-    return list;
-  };
-  view.drawList = function (name, listItems){
-    equal( listName, name );
-    equal( list.length, listItems.length );
-    equal( list[0], listItems[0].name );
-  };
-  randomChooser.createController(model, view).drawList(listName);
-});
-test("drawList - undefined list goes to first page (refresh of item view w/ no list)", 3, function() {
-  var model = {
-    getList : function (listName) {
-      equal( undefined, listName );
-    }
-  };
-  $.mobile = {
-    changePage : function(changeTo, properties) {
-      equal( changeTo, '#firstPage' );
-      ok( properties.reverse );
-    }
-  };
-  randomChooser.createController(model, {}).drawList(undefined);
 });
 test("drawSelectedList - invokes drawList with selected list", 4, function() {
   var listName = 'meh', model = {}, view = {}, list = [], controller;
@@ -105,84 +43,6 @@ test("drawSelectedList - invokes drawList with selected list", 4, function() {
     deepEqual( localList, list );
   };
   randomChooser.createController(model, view).drawSelectedList();
-});
-test("deleteList - deletes and redraws list view", 4, function() {
-  var listName = 'meh', lists = ['1'], model = {}, view = {};
-  model.deleteList = function (name) {
-    equal( name, listName );
-  };
-  model.getListNames = function () {
-    ok(true); // ensure invoked via test count in test invocation
-    return lists;
-  };
-  view.redrawLists = function (listNames){
-    equal( lists.length, listNames.length);
-    equal( lists[0], listNames[0].name );
-  };
-  randomChooser.createController(model, view).deleteList(listName);
-});
-test("deleteItem - deletes and redraws item view", 5, function() {
-  var itemName = 'meh', listName = '1', list = ['1'], model = {}, view = {};
-  model.deleteItem = function (name) {
-    equal( name, itemName ); // would normally delete the item, just assert its right item
-  };
-  model.getSelectedListName = function () {
-    return listName;
-  };
-  model.getSelectedList = function () {
-    return list;
-  };
-  model.getList = function (name) {
-    equal(name, listName);
-    return list;
-  };
-  view.setRandomDisabled = function (disabled){};
-  view.drawList = function (name, localList){
-    equal( listName, name);
-    equal( localList.length, list.length);
-    equal( localList[0].name, list[0]);
-  };
-  randomChooser.createController(model, view).deleteItem(itemName);
-});
-test("deleteItem - checks to disable random button on deletion", 1, function() {
-    var itemName = 'meh', listName = '1', list = ['1'], model = {}, view = {};
-  model.deleteItem = function (name) {};
-  model.getSelectedListName = function () {
-    return listName;
-  };
-  model.getSelectedList = function () {
-    return list;
-  };
-  model.getList = function (name) {
-    return list;
-  };
-  view.setRandomDisabled = function (disabled){
-    ok(!disabled);
-  };
-  view.drawList = function (name, localList){};
-  randomChooser.createController(model, view).deleteItem(itemName);
-});
-test("addItemToSelectedList - adds item, redraws list", 4, function() {
-  var itemName = 'meh', listName = '1', list = [], model = {}, view = {};
-  model.addItem = function (name) {
-    equal( name, itemName );
-    list.push(name);
-  };
-  model.getSelectedListName = function () {
-    return listName;
-  };
-  model.getSelectedList = function () {
-    return list;
-  };
-  model.getList = function (name) {
-    return list;
-  };
-  view.drawList = function (name, localList){
-    equal( name, listName);
-    equal( localList.length, 1);
-    equal( localList[0].name, itemName);
-  };
-  randomChooser.createController(model, view).addItemToSelectedList(itemName);
 });
 test("enableDisableRandom - disables when no list selected", 1, function() {
   var model = {}, view = {};

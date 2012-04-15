@@ -167,6 +167,18 @@ randomChooser.createView = function () {
   };
 };
 randomChooser.createController = function (model, view) {
+  function addList (listName) {
+    if(model.getList(listName) === undefined) {
+      model.addList(listName);
+      redrawFirstPage();
+      return true;
+    }
+    return false;
+  }
+  function addItemToSelectedList (itemName) {
+    model.addItem(itemName);
+    drawSelectedList();
+  }
   function redrawFirstPage () {
     var lists = [], i, listNames = model.getListNames();
     listNames.sort();
@@ -230,35 +242,35 @@ randomChooser.createController = function (model, view) {
   function setSelectedList (listName) {
     model.setSelectedListName(listName);
   }
-  return {
-    addList : function(listName) {
-      if(model.getList(listName) === undefined) {
-        model.addList(listName);
-        redrawFirstPage();
-        return true;
+  function disableAddList (listName) {
+    return listName.length === 0 || model.getList(listName) !== undefined;
+  }
+  function disableAddItem (itemName) {
+    return itemName.length === 0 || !model.isItemNameUniqueInSelectedList(itemName);
+  }
+  function initAddPage (addOkId, textFieldId, dialogId, disableAddF, addF) {
+    var addOk = $(addOkId);
+    addOk.addClass('ui-disabled');
+    $(textFieldId).keyup(function(event) {
+      var name = event.currentTarget.value.trim();
+      if(disableAddF(name)) {
+        addOk.addClass('ui-disabled');
+      } else {
+        addOk.removeClass('ui-disabled');
       }
-      return false;
-    },
+    });
+    addOk.click(function() {
+      addF($(textFieldId).val().trim());
+    });
+    $(dialogId).bind('keyup', function(event) {
+      return randomChooser.controller.ifEnterInvokeClickHandler(event, addOk, $(dialogId));
+    });
+  }
+  return {
     redrawFirstPage : function() {
       redrawFirstPage();
     },
-    setSelectedList : function(selectedListName) {
-      setSelectedList(selectedListName);
-    },
-    drawList : function(listName) {
-      drawList(listName);
-    },
     drawSelectedList : function() {
-      drawSelectedList();
-    },
-    deleteList : function(listName) {
-      deleteList(listName);
-    },
-    deleteItem : function(itemName) {
-      deleteItem(itemName);
-    },
-    addItemToSelectedList : function(itemName) {
-      model.addItem(itemName);
       drawSelectedList();
     },
     enableDisableRandom : function() {
@@ -277,12 +289,16 @@ randomChooser.createController = function (model, view) {
       }
       return false;
     },
-    disableAddItem : function (itemName) {
-      return itemName.length === 0 || !model.isItemNameUniqueInSelectedList(itemName);
+    initAddListPage : function () {
+      initAddPage('#addListOk', '#listName', '#addListPage', disableAddList, function (text){
+        addList(text);
+      });
     },
-    disableAddList : function (listName) {
-      return listName.length === 0 || model.getList(listName) !== undefined;
-    }
+    initAddItemPage : function () {
+      initAddPage('#addItemOk', '#itemName', '#addItemPage', disableAddItem, function (text){
+        addItemToSelectedList(text);
+      });
+    }  
   };
 };
 randomChooser.controller = randomChooser.createController(randomChooser.createModel(), randomChooser.createView());
@@ -291,40 +307,10 @@ $('#firstPage').live('pageinit', function(event) {
   randomChooser.controller.redrawFirstPage();
 });
 $('#addListPage').live('pageinit', function(event) {
-  var addListOk = $('#addListOk');
-  addListOk.addClass('ui-disabled');
-  $('#listName').keyup(function(event) {
-    var listName = event.currentTarget.value.trim();
-    if(randomChooser.controller.disableAddList(listName)) {
-      addListOk.addClass('ui-disabled');
-    } else {
-      addListOk.removeClass('ui-disabled');
-    }
-  });
-  addListOk.click(function() {
-    randomChooser.controller.addList($('#listName').val().trim());
-  });
-  $("#addListPage").bind('keyup', function(event) {
-    return randomChooser.controller.ifEnterInvokeClickHandler(event, addListOk, $('#addListPage'));
-  });
+  randomChooser.controller.initAddListPage();
 });
 $('#addItemPage').live('pageinit', function(event) {
-  var addItemOk = $('#addItemOk');
-  addItemOk.addClass('ui-disabled');
-  $('#itemName').keyup(function(event) {
-    var itemName = event.currentTarget.value.trim();
-    if(randomChooser.controller.disableAddItem(itemName)) {
-      addItemOk.addClass('ui-disabled');
-    } else {
-      addItemOk.removeClass('ui-disabled');
-    }
-  });
-  addItemOk.click(function() {
-    randomChooser.controller.addItemToSelectedList($('#itemName').val().trim());
-  });
-  $("#addItemPage").bind('keyup', function(event) {
-    return randomChooser.controller.ifEnterInvokeClickHandler(event, addItemOk, $('#addItemPage'));
-  });
+  randomChooser.controller.initAddItemPage();
 });
 $('#viewListPage').live('pageinit', function(event) {
   $('#random').click(function() {
