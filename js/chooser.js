@@ -76,6 +76,34 @@ randomChooser.createModel = function() {'use strict';
 };
 randomChooser.model = randomChooser.createModel();
 randomChooser.createView = function () {
+  var createDeleteAnchor = function (pageId, anchorText) {
+    return $('<a/>', {
+      'href' : pageId,
+      'data-transition' : 'slide',
+      'data-role' : 'button', 
+      'data-rel' : 'dialog', 
+      'data-transition' : 'pop',
+      'text' : anchorText
+    });
+  },
+  deleteSomething = function (deleteItem, deleteItemPage, deleteItemLabel, name, deleteItemClick) {
+      deleteItemLabel.text(name);
+      deleteItem.unbind('click');
+      deleteItem.click(deleteItemClick);
+      deleteItem.click(function () {
+        deleteItemPage.dialog ('close');
+      });
+      deleteItemPage.unbind('keyup');
+      deleteItemPage.bind('keyup', function(event) {
+        if(event.keyCode === 13 || event.which === 13) {
+          deleteItem.click();
+        }
+        if(event.keyCode === 27 || event.which === 27) {
+          deleteItemPage.dialog ('close');
+        }
+        return false;
+      });
+  };
   return {
     redrawLists : function(list) {
       var i = 0, lists = $('#lists');
@@ -93,14 +121,7 @@ randomChooser.createView = function () {
         'data-transition' : 'slide',
         'text' : listName
       });
-      deleteListAnchor = $('<a/>', {
-        'href' : '#deleteListPage',
-        'data-transition' : 'slide',
-        'data-role' : 'button', 
-        'data-rel' : 'dialog', 
-        'data-transition' : 'pop',
-        'text' : 'Delete List'
-      });
+      deleteListAnchor = createDeleteAnchor('#deleteListPage', 'Delete List');
       deleteListAnchor[0].onclick = deleteClick;
       listViewAnchor[0].onclick = viewClick;
       $('#lists').append($('<li/>', {}).append(listViewAnchor).append(deleteListAnchor));
@@ -110,14 +131,7 @@ randomChooser.createView = function () {
       itemViewAnchor = $('<a/>', {
         'text' : itemName
       });
-      deleteItemAnchor = $('<a/>', {
-        'href' : '#deleteItemPage',
-        'data-transition' : 'slide',
-        'data-role' : 'button', 
-        'data-rel' : 'dialog', 
-        'data-transition' : 'pop',
-        'text' : 'Delete Item'
-      });
+      deleteItemAnchor = createDeleteAnchor('#deleteItemPage', 'Delete Item');
       deleteItemAnchor[0].onclick = deleteClick;
       $('#listItems').append($('<li/>', {}).append(itemViewAnchor).append(deleteItemAnchor));
     },
@@ -143,42 +157,10 @@ randomChooser.createView = function () {
       $('#itemNameLabel').text(itemName);
     },
     askToDeleteItem : function(name, deleteItemClick) {
-      var deleteItem = $('#deleteItem'), deleteItemPage = $('#deleteItemPage');
-      $('#deleteItemLabel').text(name);
-      deleteItem.unbind('click');
-      deleteItem.click(deleteItemClick);
-      deleteItem.click(function () {
-        $('#deleteItemPage').dialog ('close');
-      });
-      deleteItemPage.unbind('keyup');
-      deleteItemPage.bind('keyup', function(event) {
-        if(event.keyCode === 13 || event.which === 13) {
-          deleteItem.click();
-        }
-        if(event.keyCode === 27 || event.which === 27) {
-          deleteItemPage.dialog ('close');
-        }
-        return false;
-      });
+      deleteSomething( $('#deleteItem'), $('#deleteItemPage'), $('#deleteItemLabel'), name, deleteItemClick);
     },
     askToDeleteList : function(name, deleteListClick) {
-      var deleteList = $('#deleteList'), deleteListPage = $('#deleteListPage');
-      $('#deleteListLabel').text(name);
-      deleteList.unbind('click');
-      deleteList.click(deleteListClick);
-      deleteList.click(function () {
-        $('#deleteListPage').dialog ('close');
-      });
-      deleteListPage.unbind('keyup');
-      deleteListPage.bind('keyup', function(event) {
-        if(event.keyCode === 13 || event.which === 13) {
-          deleteList.click();
-        }
-        if(event.keyCode === 27 || event.which === 27) {
-          deleteListPage.dialog ('close');
-        }
-        return false;
-      });
+      deleteSomething( $('#deleteList'), $('#deleteListPage'), $('#deleteListLabel'), name, deleteListClick);
     }
   };
 };
