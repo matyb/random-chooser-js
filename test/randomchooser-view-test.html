@@ -170,22 +170,20 @@ $(document).ready(function(){
     randomChooser.view.displayItem(itemName);
     equal (itemName, itemNameLabel.text());
   });
-  test("askToDeleteList - click handler deletes list", 2, function() {
-    var deleteList = $('#deleteList'), invoked = false;
-    $('#deleteListPage').constructor.prototype.dialog = function (){};
-    randomChooser.createView().askToDeleteList('meh', function ( list ) {
+  test("askToDelete - click handler deletes list", 2, function() {
+    var deleteList = $('#delete'), invoked = false;
+    $('#deletePage').constructor.prototype.dialog = function (){};
+    randomChooser.createView().askToDelete('meh', function () {
       invoked = true;
-    }, function () {throw "shouldn't have tried to view";});
+    });
     ok(!invoked);
-    deleteList.click();
+    $('#delete').click();
     ok(invoked);
   });
-  test("askToDeleteList - enter invokes click handler", 1, function() {
-    var deleteListPage = $('#deleteListPage'), press;
-    randomChooser.controller.deleteList = function (itemName) {};
-    $('#deleteListPage').constructor.prototype.dialog = function (){};
-    randomChooser.createView().askToDeleteList('meh');
-    $('#deleteList').click(function () {
+  test("askToDelete - enter invokes click handler", 1, function() {
+    var deleteListPage = $('#deletePage'), press;
+    deletePage.constructor.prototype.dialog = function (){};
+    randomChooser.createView().askToDelete('meh', function () {
       ok(true); // ensure invoked via test count in test invocation
     });
     press = jQuery.Event("keyup");
@@ -193,30 +191,6 @@ $(document).ready(function(){
     press.keyCode = 13;
     deleteListPage.trigger('focus');
     deleteListPage.trigger(press);
-  });
-  test("askToDeleteItem - click handler deletes item", 2, function() {
-    var deleteItem = $('#deleteItem'), invoked = false;
-    $('#deleteItemPage').constructor.prototype.dialog = function (){};
-    randomChooser.createView().askToDeleteItem('meh', function () {
-      invoked = true;
-    });
-    ok(!invoked);
-    deleteItem.click();
-    ok(invoked);
-  });
-  test("askToDeleteItem - enter invokes click handler", 1, function() {
-    var deleteItemPage = $('#deleteItemPage'), press;
-    randomChooser.controller.deleteItem = function (itemName) {};
-    $('#deleteItemPage').constructor.prototype.dialog = function (){};
-    randomChooser.createView().askToDeleteItem('meh');
-    $('#deleteItem').click(function () {
-      ok(true); // ensure invoked via test count in test invocation
-    });
-    press = jQuery.Event("keyup");
-    press.which = 13;
-    press.keyCode = 13;
-    deleteItemPage.trigger('focus');
-    deleteItemPage.trigger(press);
   });
 });
   </script>
@@ -285,22 +259,13 @@ $(document).ready(function(){
         <a data-role="button" id="selectAnother">Select Another</a>
       </div>
     </div>
-    <div data-role="page" id="deleteListPage">
+    <div data-role="page" id="deletePage">
       <div data-role="header">
         <h1>really delete?</h1>
       </div>
       <div data-role="content">
-        <h1 id="deleteListLabel" align="center"></h1>
-        <a data-role="button" id="deleteList">Yes</a>
-      </div>
-    </div>
-    <div data-role="page" id="deleteItemPage">
-      <div data-role="header">
-        <h1>really delete?</h1>
-      </div>
-      <div data-role="content">
-        <h1 id="deleteItemLabel" align="center"></h1>
-        <a data-role="button" id="deleteItem">Yes</a>
+        <h1 id="deleteLabel" align="center"></h1>
+        <a data-role="button" id="delete">Yes</a>
       </div>
     </div>
  </div>
