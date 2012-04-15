@@ -249,10 +249,10 @@ randomChooser.createController = function (model, view) {
     return itemName.length === 0 || !model.isItemNameUniqueInSelectedList(itemName);
   }
   function initAddPage (addOkId, textFieldId, dialogId, disableAddF, addF) {
-    var addOk = $(addOkId);
+    var addOk = $(addOkId), name, dialog = $(dialogId);
     addOk.addClass('ui-disabled');
     $(textFieldId).keyup(function(event) {
-      var name = event.currentTarget.value.trim();
+      name = $(textFieldId).val().trim();
       if(disableAddF(name)) {
         addOk.addClass('ui-disabled');
       } else {
@@ -260,10 +260,10 @@ randomChooser.createController = function (model, view) {
       }
     });
     addOk.click(function() {
-      addF($(textFieldId).val().trim());
+      addF(name);
     });
-    $(dialogId).bind('keyup', function(event) {
-      return randomChooser.controller.ifEnterInvokeClickHandler(event, addOk, $(dialogId));
+    dialog.bind('keyup', function(event) {
+      return randomChooser.controller.ifEnterInvokeClickHandler(event, addOk, dialog);
     });
   }
   return {
