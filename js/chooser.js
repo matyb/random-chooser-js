@@ -155,6 +155,9 @@ randomChooser.createView = function () {
         if(event.keyCode === 13 || event.which === 13) {
           deleteItem.click();
         }
+        if(event.keyCode === 27 || event.which === 27) {
+          deleteItemPage.dialog ('close');
+        }
         return false;
       });
     },
@@ -170,6 +173,9 @@ randomChooser.createView = function () {
       deleteListPage.bind('keyup', function(event) {
         if(event.keyCode === 13 || event.which === 13) {
           deleteList.click();
+        }
+        if(event.keyCode === 27 || event.which === 27) {
+          deleteListPage.dialog ('close');
         }
         return false;
       });
@@ -282,6 +288,9 @@ $('#addListPage').live('pageinit', function(event) {
     if((event.keyCode === 13 || event.which === 13) && addListOk[0].className.indexOf('ui-disabled') === -1) {
       addListOk.click();
     }
+    if(event.keyCode === 27 || event.which === 27) {
+      $("#addListPage").dialog ('close');
+    }
     return false;
   });
 });
@@ -303,6 +312,9 @@ $('#addItemPage').live('pageinit', function(event) {
     if((event.keyCode === 13 || event.which === 13) && addItemOk[0].className.indexOf('ui-disabled') === -1) {
       addItemOk.click();
     }
+    if(event.keyCode === 27 || event.which === 27) {
+      $("#addItemPage").dialog ('close');
+    }
     return false;
   });
 });
@@ -317,8 +329,11 @@ $('#viewItemPage').live('pageinit', function(event) {
     randomChooser.controller.selectRandomItem();
   });
   $("#viewItemPage").bind('keyup', function(event) {
-    if(event.keyCode === 13 && selectAnother[0].className.indexOf('ui-disabled') === -1) {
+    if((event.keyCode === 13 || event.which === 13) && selectAnother[0].className.indexOf('ui-disabled') === -1) {
       selectAnother.click();
+    }
+    if(event.keyCode === 27 || event.which === 27) {
+      $('#viewItemPage').dialog ('close');
     }
     return false;
   });
