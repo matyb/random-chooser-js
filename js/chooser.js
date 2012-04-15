@@ -85,7 +85,21 @@ randomChooser.createView = function () {
       'data-transition' : 'pop',
       'text' : anchorText
     });
-  }
+  },
+  addToList = function (viewAnchorText, deleteAnchorText, htmlListId, deleteClick, viewClick, viewPageId) {
+    var listViewAnchor, deleteListAnchor;
+    listViewAnchor = $('<a/>', {
+      'text' : viewAnchorText
+    });
+    if(viewPageId){
+      listViewAnchor[0].href = viewPageId;
+      listViewAnchor[0]['data-transition'] = 'slide';
+    }
+    deleteListAnchor = createDeleteAnchor(deleteAnchorText);
+    deleteListAnchor[0].onclick = deleteClick;
+    listViewAnchor[0].onclick = viewClick;
+    $(htmlListId).append($('<li/>', {}).append(listViewAnchor).append(deleteListAnchor));
+  };
   return {
     redrawLists : function(list) {
       var i = 0, lists = $('#lists');
@@ -97,25 +111,10 @@ randomChooser.createView = function () {
       lists.listview('refresh');
     },
     addList : function(listName, deleteClick, viewClick) {
-      var listViewAnchor, deleteListAnchor;
-      listViewAnchor = $('<a/>', {
-        'href' : '#viewListPage',
-        'data-transition' : 'slide',
-        'text' : listName
-      });
-      deleteListAnchor = createDeleteAnchor('Delete List');
-      deleteListAnchor[0].onclick = deleteClick;
-      listViewAnchor[0].onclick = viewClick;
-      $('#lists').append($('<li/>', {}).append(listViewAnchor).append(deleteListAnchor));
+      addToList(listName, 'Delete List', '#lists', deleteClick, viewClick, '#viewListPage');
     },
     addItem : function(itemName, deleteClick) {
-      var itemViewAnchor, deleteItemAnchor;
-      itemViewAnchor = $('<a/>', {
-        'text' : itemName
-      });
-      deleteItemAnchor = createDeleteAnchor('Delete Item');
-      deleteItemAnchor[0].onclick = deleteClick;
-      $('#listItems').append($('<li/>', {}).append(itemViewAnchor).append(deleteItemAnchor));
+      addToList(itemName, 'Delete Item', '#listItems', deleteClick, function(){});
     },
     drawList : function(listName, list) {
       var i;
