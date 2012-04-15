@@ -152,7 +152,7 @@ randomChooser.createView = function () {
       });
       deleteItemPage.unbind('keyup');
       deleteItemPage.bind('keyup', function(event) {
-        if(event.keyCode === 13) {
+        if(event.keyCode === 13 || event.which === 13) {
           deleteItem.click();
         }
         return false;
@@ -168,7 +168,7 @@ randomChooser.createView = function () {
       });
       deleteListPage.unbind('keyup');
       deleteListPage.bind('keyup', function(event) {
-        if(event.keyCode === 13) {
+        if(event.keyCode === 13 || event.which === 13) {
           deleteList.click();
         }
         return false;
@@ -279,7 +279,7 @@ $('#addListPage').live('pageinit', function(event) {
     randomChooser.controller.addList($('#listName').val().trim());
   });
   $("#addListPage").bind('keyup', function(event) {
-    if(event.keyCode === 13 && addListOk[0].className.indexOf('ui-disabled') === -1) {
+    if((event.keyCode === 13 || event.which === 13) && addListOk[0].className.indexOf('ui-disabled') === -1) {
       addListOk.click();
     }
     return false;
@@ -300,7 +300,7 @@ $('#addItemPage').live('pageinit', function(event) {
     randomChooser.controller.addItemToSelectedList($('#itemName').val().trim());
   });
   $("#addItemPage").bind('keyup', function(event) {
-    if(event.keyCode === 13 && addItemOk[0].className.indexOf('ui-disabled') === -1) {
+    if((event.keyCode === 13 || event.which === 13) && addItemOk[0].className.indexOf('ui-disabled') === -1) {
       addItemOk.click();
     }
     return false;
