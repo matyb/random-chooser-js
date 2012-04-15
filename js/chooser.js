@@ -76,34 +76,16 @@ randomChooser.createModel = function() {'use strict';
 };
 randomChooser.model = randomChooser.createModel();
 randomChooser.createView = function () {
-  var createDeleteAnchor = function (pageId, anchorText) {
+  var createDeleteAnchor = function (anchorText) {
     return $('<a/>', {
-      'href' : pageId,
+      'href' : '#deletePage',
       'data-transition' : 'slide',
       'data-role' : 'button', 
       'data-rel' : 'dialog', 
       'data-transition' : 'pop',
       'text' : anchorText
     });
-  },
-  deleteSomething = function (deleteItem, deleteItemPage, deleteItemLabel, name, deleteItemClick) {
-      deleteItemLabel.text(name);
-      deleteItem.unbind('click');
-      deleteItem.click(deleteItemClick);
-      deleteItem.click(function () {
-        deleteItemPage.dialog ('close');
-      });
-      deleteItemPage.unbind('keyup');
-      deleteItemPage.bind('keyup', function(event) {
-        if(event.keyCode === 13 || event.which === 13) {
-          deleteItem.click();
-        }
-        if(event.keyCode === 27 || event.which === 27) {
-          deleteItemPage.dialog ('close');
-        }
-        return false;
-      });
-  };
+  }
   return {
     redrawLists : function(list) {
       var i = 0, lists = $('#lists');
@@ -121,7 +103,7 @@ randomChooser.createView = function () {
         'data-transition' : 'slide',
         'text' : listName
       });
-      deleteListAnchor = createDeleteAnchor('#deleteListPage', 'Delete List');
+      deleteListAnchor = createDeleteAnchor('Delete List');
       deleteListAnchor[0].onclick = deleteClick;
       listViewAnchor[0].onclick = viewClick;
       $('#lists').append($('<li/>', {}).append(listViewAnchor).append(deleteListAnchor));
@@ -131,7 +113,7 @@ randomChooser.createView = function () {
       itemViewAnchor = $('<a/>', {
         'text' : itemName
       });
-      deleteItemAnchor = createDeleteAnchor('#deleteItemPage', 'Delete Item');
+      deleteItemAnchor = createDeleteAnchor('Delete Item');
       deleteItemAnchor[0].onclick = deleteClick;
       $('#listItems').append($('<li/>', {}).append(itemViewAnchor).append(deleteItemAnchor));
     },
@@ -156,11 +138,24 @@ randomChooser.createView = function () {
     displayItem : function(itemName) {
       $('#itemNameLabel').text(itemName);
     },
-    askToDeleteItem : function(name, deleteItemClick) {
-      deleteSomething( $('#deleteItem'), $('#deleteItemPage'), $('#deleteItemLabel'), name, deleteItemClick);
-    },
-    askToDeleteList : function(name, deleteListClick) {
-      deleteSomething( $('#deleteList'), $('#deleteListPage'), $('#deleteListLabel'), name, deleteListClick);
+    askToDelete : function(name, deleteClick) {
+      var deleteButton = $('#delete'), deletePage = $('#deletePage'), deleteLabel = $('#deleteLabel');
+      deleteLabel.text(name);
+      deleteButton.unbind('click');
+      deleteButton.click(deleteClick);
+      deleteButton.click(function () {
+        deletePage.dialog ('close');
+      });
+      deletePage.unbind('keyup');
+      deletePage.bind('keyup', function(event) {
+        if(event.keyCode === 13 || event.which === 13) {
+          deleteButton.click();
+        }
+        if(event.keyCode === 27 || event.which === 27) {
+          deletePage.dialog ('close');
+        }
+        return false;
+      });
     }
   };
 };
@@ -184,7 +179,7 @@ randomChooser.createController = function () {
           lists.push({
             name : listName,
             deleteClick : function() {
-              randomChooser.view.askToDeleteList(listName, function(){
+              randomChooser.view.askToDelete(listName, function(){
                 randomChooser.controller.deleteList(listName);
               });
             },
@@ -214,7 +209,7 @@ randomChooser.createController = function () {
           list.push({
             name : item,
             deleteClick : function () {
-              randomChooser.view.askToDeleteItem(item, function () {
+              randomChooser.view.askToDelete(item, function () {
                 randomChooser.controller.deleteItem(item);
               });
             }
@@ -319,9 +314,6 @@ $('#viewItemPage').live('pageinit', function(event) {
     }
     return false;
   });
-});
-$('#deletePage').live('pageinit', function (event) {
-  
 });
 $('#viewListPage').live('pagebeforeshow', function(event) {
   randomChooser.controller.enableDisableRandom();
