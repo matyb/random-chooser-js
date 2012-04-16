@@ -179,26 +179,43 @@ randomChooser.createController = function (model, view) {
     model.addItem(itemName);
     drawSelectedList();
   }
-  function redrawFirstPage () {
-    var lists = [], i, listNames = model.getListNames();
-    listNames.sort();
-    for (i = 0; i < listNames.length; i += 1) {
+  function createLineItemModels (names, askToDeleteF, viewF) {
+    var lists = [], i;
+    names.sort();
+    for (i = 0; i < names.length; i += 1) {
       (function () {
-        var listName = listNames[i]; 
+        var name = names[i]; 
         lists.push({
-          name : listName,
+          name : name,
           deleteClick : function() {
-            view.askToDelete(listName, function(){
-              deleteList(listName);
+            view.askToDelete(name, function(){
+              askToDeleteF(name);
             });
           },
           viewClick : function() {
-            setSelectedList(listName);
+            viewF(name);
           } 
         });
       }());
     }
-    view.redrawLists(lists);
+    return lists;
+  }
+  function redrawFirstPage () {
+    view.redrawLists( createLineItemModels( model.getListNames(), 
+          function(listName) { deleteList( listName ) }, 
+          function(listName) { model.setSelectedListName( listName ) } ));
+  }
+  function drawList(listName) {
+    var list = [], listItems = model.getList(listName), i;
+    if(listItems === undefined){ // probably a page refresh - go back to first page
+      $.mobile.changePage('#firstPage', {
+        reverse: true
+      });
+      return false;
+    }
+    view.drawList( listName, createLineItemModels(listItems, function(itemName) {
+      deleteItem(itemName);
+    }, function(itemName) {}));
   }
   function deleteList (listName) {
     model.deleteList(listName);
@@ -215,33 +232,6 @@ randomChooser.createController = function (model, view) {
   function drawSelectedList() {
     drawList(model.getSelectedListName());
   }
-  function drawList(listName) {
-    var list = [], listItems = model.getList(listName), i;
-    if(listItems === undefined){ // probably a page refresh - go back to first page
-      $.mobile.changePage("#firstPage", {
-        reverse: true
-      });
-      return false;
-    }
-    listItems.sort();
-    for (i = 0; i < listItems.length; i += 1) {
-      (function () {
-        var item = listItems[i];
-        list.push({
-          name : item,
-          deleteClick : function () {
-            view.askToDelete(item, function () {
-              deleteItem(item);
-            });
-          }
-        });
-      }());
-    }
-    view.drawList(listName, list);
-  }
-  function setSelectedList (listName) {
-    model.setSelectedListName(listName);
-  }
   function disableAddList (listName) {
     return listName.length === 0 || model.getList(listName) !== undefined;
   }
@@ -251,7 +241,7 @@ randomChooser.createController = function (model, view) {
   function initAddPage (addOkId, textFieldId, dialogId, disableAddF, addF) {
     var addOk = $(addOkId), name, dialog = $(dialogId);
     addOk.addClass('ui-disabled');
-    $(textFieldId).keyup(function(event) {
+    $(textFieldId).bind( 'keyup', function(event) {
       name = $(textFieldId).val().trim();
       if(disableAddF(name)) {
         addOk.addClass('ui-disabled');
