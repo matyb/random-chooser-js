@@ -9,83 +9,84 @@
   <script type="text/javascript" src="qunit.js"></script>
 
   <script>
+  var $, deepEqual, equal, module, ok, raises, randomChooser, test;
   $(document).ready(function(){
-module("Controller");
-test("construction - blows up with no model", 1, function() {
-  raises ( function () {
-    randomChooser.createController(null, randomChooser.createView());
-  }, 'model: "' + null + '", view: "' + {} +'" - somethings wrong...' );
-});
-test("construction - blows up with no view", 1, function() {
-  raises ( function () {
-    randomChooser.createController(randomChooser.createModel(), null);
-  }, 'model: "' + {} + '", view: "' + null +'" - somethings wrong...' );
-});
-test("construction - with model and view is ok", 0, function() {
-  randomChooser.createController({}, {});
-});
-test("redrawFistPage - redraws first page", 3, function() {
-  var lists = ['meh'], model = {}, view = {};
-  model.getListNames = function () {
-    ok(true); // ensure invoked via test count in test invocation
-    return lists;
-  };
-  view.redrawLists = function (localLists) {
-    equal ( lists.length, localLists.length );
-    equal ( lists[0], localLists[0].name );
-  };
-  randomChooser.createController(model, view).redrawFirstPage();
-});
-test("drawSelectedList - invokes drawList with selected list", 4, function() {
-  var listName = 'meh', model = {}, view = {}, list = [], controller;
-  model.getSelectedListName = function () {
-    ok(true); // ensures invoked via test count in test invocation
-    return listName;
-  };
-  model.getList = function (name) {
-    equal( name, listName );
-    return list;
-  };
-  view.drawList = function (name, localList){
-    equal( name, listName );
-    deepEqual( localList, list );
-  };
-  randomChooser.createController(model, view).drawSelectedList();
-});
-test("enableDisableRandom - disables when no list selected", 1, function() {
-  var model = {}, view = {};
-  model.getSelectedListName = function () {
-    return undefined;
-  };
-  view.setRandomDisabled = function (disabled) {
-    ok(disabled);
-  };
-  randomChooser.createController(model, view).enableDisableRandom();
-});
-test("enableDisableRandom - disables when list is empty", 1, function() {
-  var model = {}, view = {};
-  model.getSelectedListName = function () {
-    return '1';
-  };
-  model.getSelectedList = function () {
-    return [];
-  };
-  view.setRandomDisabled = function (disabled) {
-    ok(disabled);
-  };
-  randomChooser.createController(model, view).enableDisableRandom();
-});
-test("selectRandomItem - selects and displays item from selected list", 1, function() {
-  var model = {}, view = {};
-  model.getSelectedList = function () {
-    return ['1'];
-  };
-  view.displayItem = function (arg) {
-    equal( arg, '1' );
-  };
-  randomChooser.createController(model, view).selectRandomItem();
-});
+  module("Controller");
+  test("construction - blows up with no model", 1, function() {
+    raises( function() {
+      randomChooser.createController(null, randomChooser.createView());
+    }, 'model: "' + null + '", view: "' + {} +'" - somethings wrong...' );
   });
+  test("construction - blows up with no view", 1, function() {
+    raises( function() {
+      randomChooser.createController(randomChooser.createModel(), null);
+    }, 'model: "' + {} + '", view: "' + null +'" - somethings wrong...' );
+  });
+  test("construction - with model and view is ok", 0, function() {
+    randomChooser.createController({}, {});
+  });
+  test("redrawFistPage - redraws first page", 3, function() {
+    var lists = ['meh'], model = {}, view = {};
+    model.getListNames = function () {
+      ok(true); // ensure invoked via test count in test invocation
+      return lists;
+    };
+    view.redrawLists = function (localLists) {
+      equal( lists.length, localLists.length );
+      equal( lists[0], localLists[0].name );
+    };
+    randomChooser.createController(model, view).redrawFirstPage();
+  });
+  test("drawSelectedList - invokes drawList with selected list", 4, function() {
+    var listName = 'meh', model = {}, view = {}, list = [], controller;
+    model.getSelectedListName = function () {
+      ok(true); // ensures invoked via test count in test invocation
+      return listName;
+    };
+    model.getList = function (name) {
+      equal( name, listName );
+      return list;
+    };
+    view.drawList = function (name, localList){
+      equal( name, listName );
+      deepEqual( localList, list );
+    };
+    randomChooser.createController(model, view).drawSelectedList();
+  });
+  test("enableDisableRandom - disables when no list selected", 1, function() {
+    var model = {}, view = {};
+    model.getSelectedListName = function () {
+      return undefined;
+    };
+    view.setRandomDisabled = function (disabled) {
+      ok(disabled);
+    };
+    randomChooser.createController(model, view).enableDisableRandom();
+  });
+  test("enableDisableRandom - disables when list is empty", 1, function() {
+    var model = {}, view = {};
+    model.getSelectedListName = function () {
+      return '1';
+    };
+    model.getSelectedList = function () {
+      return [];
+    };
+    view.setRandomDisabled = function (disabled) {
+      ok(disabled);
+    };
+    randomChooser.createController(model, view).enableDisableRandom();
+  });
+  test("selectRandomItem - selects and displays item from selected list", 1, function() {
+    var model = {}, view = {};
+    model.getSelectedList = function () {
+      return ['1'];
+    };
+    view.displayItem = function (arg) {
+      equal( arg, '1' );
+    };
+    randomChooser.createController(model, view).selectRandomItem();
+  });
+});
   </script>
   
 </head>

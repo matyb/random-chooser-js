@@ -1,24 +1,24 @@
-var randomChooser = ( function() {
+var $, window, randomChooser = ( function(win) {
     var controller;
     if (!$) {
         throw 'jquery is required, please include it before this script';
     }
     
-    function createLocalStorage (win) {
+    function createLocalStorage (windo) {
         var isLocalStorageSupported = false;
         try {
-            isLocalStorageSupported = 'localStorage' in win && win['localStorage'] !== null;
-            win['localStorage'].setItem('random-chooser-saveable-test', 'success');
+            isLocalStorageSupported = 'localStorage' in windo && windo.localStorage !== null;
+            windo.localStorage.setItem('random-chooser-saveable-test', 'success');
             //test mutability - safari throws in private mode
-            if(win['localStorage'].removeItem) {// not used by rest of application
-                win['localStorage'].removeItem('random-chooser-saveable-test', 'success');
+            if(windo.localStorage.removeItem) {// not used by rest of application
+                windo.localStorage.removeItem('random-chooser-saveable-test', 'success');
             }
         } catch (e) {
             isLocalStorageSupported = false;
-            win.alert('Random Chooser cannot save lists, you may have private browsing enabled.');
+            windo.alert('Random Chooser cannot save lists, you may have private browsing enabled.');
         }
         if(isLocalStorageSupported) {
-            return win.localStorage;
+            return windo.localStorage;
         } else {
             return ( function() {
                 var storage = {};
@@ -108,13 +108,12 @@ var randomChooser = ( function() {
           return getList(listName);
         }
       };
-    };
+    }
     
     function createView () {
       var createDeleteAnchor = function (anchorText) {
         return $('<a/>', {
           'href' : '#deletePage',
-          'data-transition' : 'slide',
           'data-role' : 'button', 
           'data-rel' : 'dialog', 
           'data-transition' : 'pop',
@@ -184,7 +183,7 @@ var randomChooser = ( function() {
           deleteButton.unbind('click');
           deleteButton.click(deleteClick);
           deleteButton.click(function () {
-            deletePage.dialog ('close');
+            deletePage.dialog('close');
           });
           deletePage.unbind('keyup');
           deletePage.bind('keyup', function(event) {
@@ -192,15 +191,16 @@ var randomChooser = ( function() {
               deleteButton.click();
             }
             if(event.keyCode === 27 || event.which === 27) {
-              deletePage.dialog ('close');
+              deletePage.dialog('close');
             }
             return false;
           });
         }
       };
-    };
+    }
     
-    createController = function (model, view) {
+    function createController (model, view) {
+      var deleteItem, redrawFirstPage;
       if(!model || !view){
         throw 'model: "' + model + '", view: "' + view +'" - somethings wrong...';
       }
@@ -211,10 +211,6 @@ var randomChooser = ( function() {
           return true;
         }
         return false;
-      }
-      function addItemToSelectedList (itemName) {
-        model.addItem(itemName);
-        drawSelectedList();
       }
       function createLineItemModels (names, askToDeleteF, viewF) {
         var lists = [], i;
@@ -237,11 +233,6 @@ var randomChooser = ( function() {
         }
         return lists;
       }
-      function redrawFirstPage () {
-        view.redrawLists( createLineItemModels( model.getListNames(), 
-              function(listName) { deleteList( listName ) }, 
-              function(listName) { model.setSelectedListName( listName ) } ));
-      }
       function drawList(listName) {
         var list = [], listItems = model.getList(listName), i;
         if(listItems === undefined){ // probably a page refresh - go back to first page
@@ -254,21 +245,30 @@ var randomChooser = ( function() {
           deleteItem(itemName);
         }, function(itemName) {}));
       }
+      function drawSelectedList() {
+        drawList(model.getSelectedListName());
+      }
+      function addItemToSelectedList (itemName) {
+        model.addItem(itemName);
+        drawSelectedList();
+      }
       function deleteList (listName) {
         model.deleteList(listName);
         redrawFirstPage();
       }
-      function deleteItem (itemName) {
-        model.deleteItem(itemName);
-        enableDisableRandom();
-        drawSelectedList();
-      }
       function enableDisableRandom () {
         view.setRandomDisabled(model.getSelectedListName() === undefined || model.getSelectedList().length <= 0);
       }
-      function drawSelectedList() {
-        drawList(model.getSelectedListName());
-      }
+      deleteItem = function (itemName) {
+        model.deleteItem(itemName);
+        enableDisableRandom();
+        drawSelectedList();
+      };
+      redrawFirstPage = function () {
+        view.redrawLists( createLineItemModels( model.getListNames(), 
+              function(listName) { deleteList( listName ); }, 
+              function(listName) { model.setSelectedListName( listName ); } ));
+      };
       function disableAddList (listName) {
         return listName.length === 0 || model.getList(listName) !== undefined;
       }
@@ -280,7 +280,7 @@ var randomChooser = ( function() {
           element.click();
         }
         if(event.keyCode === 27 || event.which === 27) {
-          page.dialog ('close');
+          page.dialog('close');
         }
         return false;
       }
@@ -330,9 +330,9 @@ var randomChooser = ( function() {
           });
         }  
       };
-    };
+    }
     
-    controller = createController(createModel(createLocalStorage(window)), createView());
+    controller = createController(createModel(createLocalStorage(win)), createView());
     
     // JQuery Mobile page events & handlers
     $('#firstPage').live('pageinit', function (event) {
@@ -388,4 +388,4 @@ var randomChooser = ( function() {
         createController : createController,
         createLocalStorage : createLocalStorage
     };
-}());
+}(window));
