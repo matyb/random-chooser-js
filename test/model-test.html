@@ -6,13 +6,14 @@
   <link rel="stylesheet" href="qunit.css" type="text/css" media="screen" />
   <script type="text/javascript" src="../js/json2.js"></script>
   <script type="text/javascript" src="../js/jquery-1.6.4.min.js"></script>
-  <script type="text/javascript" src="../js/model.js"></script>
+  <script type="text/javascript" src="../js/chooser.js"></script>
   <script type="text/javascript" src="qunit.js"></script>
 
   <script>
   $(document).ready(function(){
+    var localStorage;
 QUnit.testStart = function (name) {
-  randomChooser.localStorage = (function () {
+  localStorage = (function () {
     var storage = {};
     return {
       getItem : function(key) {
@@ -26,120 +27,118 @@ QUnit.testStart = function (name) {
 };
 module("Model");
 test("saves new random-chooser-lists object if not found", 2, function() {
-  equal( randomChooser.localStorage.getItem('random-chooser-lists'), null);
-  randomChooser.createModel();
-  equal( randomChooser.localStorage.getItem('random-chooser-lists'), "{}");
+  equal( localStorage.getItem('random-chooser-lists'), null);
+  randomChooser.createModel(localStorage);
+  equal( localStorage.getItem('random-chooser-lists'), "{}");
 });
 test("retrieves existing random-chooser-lists", 1, function() {
-  randomChooser.localStorage = {
+  localStorage = {
     getItem : function (key) {
       equal ('random-chooser-lists', key);
     },
     setItem : function (){} // not testing this here, just added to avoid exception
   };
-  randomChooser.createModel();  
+  randomChooser.createModel(localStorage);  
 });
-test("addList adds a List to localStorage", 2, function() {
+test("addList adds a List to localStorage", 1, function() {
   var listName = 'listName', model;
-  model = randomChooser.createModel(); 
+  model = randomChooser.createModel(localStorage); 
   // ensure db for app is empty
-  randomChooser.localStorage.setItem( 'random-chooser-lists', '{}' ); 
-  equal ( randomChooser.localStorage.getItem('random-chooser-lists'), '{}' );
+  localStorage.setItem( 'random-chooser-lists', '{}' ); 
   model.addList(listName);
-  equal ( randomChooser.localStorage.getItem('random-chooser-lists'), '{\"' + listName + '\":[]}');
+  equal ( localStorage.getItem('random-chooser-lists'), '{\"' + listName + '\":[]}');
 });
 test("deleteList deletes a List from localStorage", 1, function() {
-  var model = randomChooser.createModel(), listName = 'listName';
-  randomChooser.localStorage.setItem('random-chooser-lists', JSON.stringify( { listName : [] } ));
+  var model = randomChooser.createModel(localStorage), listName = 'listName';
+  localStorage.setItem('random-chooser-lists', JSON.stringify( { listName : [] } ));
   model.deleteList(listName);
-  deepEqual ( randomChooser.localStorage.getItem('random-chooser-lists'), "{}");
+  deepEqual ( localStorage.getItem('random-chooser-lists'), "{}");
 });
 test("getSelectedListName returns undefined", 1, function() {
-  var model = randomChooser.createModel();
+  var model = randomChooser.createModel(localStorage);
   equal ( model.getSelectedListName(), undefined );
 });
 test("setSelectedListName sets the name of the selected list", 1, function() {
-  var model = randomChooser.createModel(), listName = 'listName';
+  var model = randomChooser.createModel(localStorage), listName = 'listName';
   model.setSelectedListName(listName);
   equal ( model.getSelectedListName(), listName );
 });
 test("isItemNameUniqueInSelectedList raise exception if no list selected", 1, function() {
-  var model = randomChooser.createModel();
+  var model = randomChooser.createModel(localStorage);
   raises ( function () {
     model.isItemNameUniqueInSelectedList('listName');
   },"Invalid list is selected: 'undefined'", 'Expected an exception, result is not valid when no list selected' );
 });
 test("isItemNameUniqueInSelectedList - is NOT unique", 1, function() {
   var model, listName = 'listName', itemName = '123';
-  randomChooser.localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[\"' + itemName + '\"]}' );
-  model = randomChooser.createModel();
+  localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[\"' + itemName + '\"]}' );
+  model = randomChooser.createModel(localStorage);
   model.setSelectedListName( listName );
   ok ( !model.isItemNameUniqueInSelectedList(itemName) );
 });
 test("isItemNameUniqueInSelectedList - IS unique", 1, function() {
   var model, listName = 'listName';
-  randomChooser.localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[]}' );
-  model = randomChooser.createModel();
+  localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[]}' );
+  model = randomChooser.createModel(localStorage);
   model.setSelectedListName( listName );
   ok ( model.isItemNameUniqueInSelectedList('123') );
 });
 test("getListNames - empty", 1, function() {
   var model, listName = 'listName';
-  randomChooser.localStorage.setItem('random-chooser-lists', '{}' );
-  model = randomChooser.createModel();
+  localStorage.setItem('random-chooser-lists', '{}' );
+  model = randomChooser.createModel(localStorage);
   deepEqual ( [], model.getListNames() );
 });
 test("getListNames - exist", 1, function() {
   var model, listName = 'listName';
-  randomChooser.localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[]}' );
-  model = randomChooser.createModel();
+  localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[]}' );
+  model = randomChooser.createModel(localStorage);
   deepEqual ( [listName], model.getListNames() );
 });
 test("addItem - raises exception if invoked with no selected list", 1, function() {
-  var model = randomChooser.createModel();
+  var model = randomChooser.createModel(localStorage);
   raises ( function () {
     model.addItem('listName');
   },"Invalid list is selected: 'undefined'", 'Expected an exception, result is not valid when no list selected' );
 });
 test("addItem - adds an item to currently selected list", 1, function() {
   var model, listName = 'listName', itemName = '123';
-  randomChooser.localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[]}' );
-  model = randomChooser.createModel();
+  localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[]}' );
+  model = randomChooser.createModel(localStorage);
   model.setSelectedListName(listName);
   model.addItem(itemName);
-  equal ( randomChooser.localStorage.getItem('random-chooser-lists'), '{\"' + listName + '\":[\"' + itemName + '\"]}' );
+  equal ( localStorage.getItem('random-chooser-lists'), '{\"' + listName + '\":[\"' + itemName + '\"]}' );
 });
 test("deleteItem - raises exception if invoked with no selected list", 1, function() {
-  var model = randomChooser.createModel();
   raises ( function () {
-    model.deleteItem('listName');
+    randomChooser.createModel(localStorage).deleteItem('listName');
   },"Invalid list is selected: 'undefined'", 'Expected an exception, result is not valid when no list selected' );
 });
 test("deleteItem - deletes an item from currently selected list", 1, function() {
   var model, listName = 'listName', itemName = '123';
-  randomChooser.localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[\"' + itemName + '\"]}' );
-  model = randomChooser.createModel();
+  localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[\"' + itemName + '\"]}' );
+  model = randomChooser.createModel(localStorage);
   model.setSelectedListName(listName);
   model.deleteItem(itemName);
-  equal ( randomChooser.localStorage.getItem('random-chooser-lists'), '{\"' + listName + '\":[]}');
+  equal ( localStorage.getItem('random-chooser-lists'), '{\"' + listName + '\":[]}');
 });
 test("getSelectedList - undefined when no list selected", 1, function() {
-  equal ( randomChooser.createModel().getSelectedList(), undefined );
+  equal ( randomChooser.createModel(localStorage).getSelectedList(), undefined );
 });
 test("getSelectedList - is the list selected", 1, function() {
-  var listName = 'listName', itemName = '123';
-  randomChooser.localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[\"' + itemName + '\"]}' );
-  randomChooser.model = randomChooser.createModel();
-  randomChooser.model.setSelectedListName(listName);
-  deepEqual ( randomChooser.model.getSelectedList(), [itemName] );
+  var listName = 'listName', itemName = '123', model;
+  localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[\"' + itemName + '\"]}' );
+  model = randomChooser.createModel(localStorage)
+  model.setSelectedListName(listName);
+  deepEqual ( model.getSelectedList(), [itemName] );
 });
 test("getList - undefined when no list selected", 1, function() {
-  equal ( randomChooser.createModel().getList('some list name'), undefined );
+  equal ( randomChooser.createModel(localStorage).getList('some list name'), undefined );
 });
 test("getList - is the list for the provided name", 1, function() {
   var listName = 'listName', itemName = '123';
-  randomChooser.localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[\"' + itemName + '\"]}' );
-  deepEqual ( randomChooser.createModel().getList(listName), [itemName] );
+  localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[\"' + itemName + '\"]}' );
+  deepEqual ( randomChooser.createModel(localStorage).getList(listName), [itemName] );
 });
   });
   </script>

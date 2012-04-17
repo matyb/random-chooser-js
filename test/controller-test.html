@@ -5,23 +5,20 @@
   <title>Random Chooser Tests</title>
   <link rel="stylesheet" href="qunit.css" type="text/css" media="screen" />
   <script type="text/javascript" src="../js/jquery-1.6.4.min.js"></script>
-  <script type="text/javascript" src="../js/controller.js"></script>
+  <script type="text/javascript" src="../js/chooser.js"></script>
   <script type="text/javascript" src="qunit.js"></script>
 
   <script>
   $(document).ready(function(){
-QUnit.testStart = function (name) {
-  randomChooser.controller = randomChooser.createController( {} , {} );
-};
 module("Controller");
 test("construction - blows up with no model", 1, function() {
   raises ( function () {
-    randomChooser.createController(null, {});
+    randomChooser.createController(null, randomChooser.createView());
   }, 'model: "' + null + '", view: "' + {} +'" - somethings wrong...' );
 });
 test("construction - blows up with no view", 1, function() {
   raises ( function () {
-    randomChooser.createController({}, null);
+    randomChooser.createController(randomChooser.createModel(), null);
   }, 'model: "' + {} + '", view: "' + null +'" - somethings wrong...' );
 });
 test("construction - with model and view is ok", 0, function() {
