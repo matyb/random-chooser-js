@@ -212,24 +212,21 @@ var $, window, randomChooser = ( function(win) {
         }
         return false;
       }
-      function createLineItemModels (names, askToDeleteF, viewF) {
+      function createLineItemModels (names, deleteF, viewF) {
         var lists = [], i;
         names.sort();
         for (i = 0; i < names.length; i += 1) {
-          (function () {
-            var name = names[i]; 
             lists.push({
-              name : name,
+              name : names[i],
               deleteClick : function() {
-                view.askToDelete(name, function(){
-                  askToDeleteF(name);
+                view.askToDelete(names[i], function(){
+                  deleteF(names[i]);
                 });
               },
               viewClick : function() {
-                viewF(name);
+                viewF(names[i]);
               } 
             });
-          }());
         }
         return lists;
       }
