@@ -5,21 +5,21 @@ var $, window, randomChooser = (function (win) {
         throw 'jquery is required, please include it before this script';
     }
     function createLocalStorage(windo) {
-        var isLocalStorageSupported = false, localStorage;
-        try {
-            isLocalStorageSupported = windo.localStorage !== undefined;
-            windo.localStorage.setItem('random-chooser-saveable-test', 'success');
-            // test mutability - safari throws in private mode
-            if (windo.localStorage.removeItem) { // not used by rest of application
-                windo.localStorage.removeItem('random-chooser-saveable-test', 'success');
-            }
-        } catch (e) {
-            isLocalStorageSupported = false;
-            windo.alert('Random Chooser cannot save lists, you may have private browsing enabled.');
-        }
+        var isLocalStorageSupported =  window.localStorage !== undefined, localStorage;
         if (isLocalStorageSupported) {
-            localStorage = windo.localStorage;
-        } else {
+            try {
+                windo.localStorage.setItem('random-chooser-saveable-test', 'success');
+                // test mutability - safari throws in private mode
+                if (windo.localStorage.removeItem) { // not used by rest of application
+                    windo.localStorage.removeItem('random-chooser-saveable-test', 'success');
+                }
+                localStorage = windo.localStorage;
+            } catch (e) {
+                isLocalStorageSupported = false;
+                windo.alert('Random Chooser cannot save lists, you may have private browsing enabled.');
+            }
+        } 
+        if (!isLocalStorageSupported) { // not supported OR doesn't support writes
             localStorage = (function () {
                 var storage = {};
                 return {
