@@ -9,8 +9,8 @@ var $, window, randomChooser = ( function(win) {
         try {
             isLocalStorageSupported = 'localStorage' in windo && windo.localStorage !== null;
             windo.localStorage.setItem('random-chooser-saveable-test', 'success');
-            //test mutability - safari throws in private mode
-            if(windo.localStorage.removeItem) {// not used by rest of application
+            // test mutability - safari throws in private mode
+            if(windo.localStorage.removeItem) { // not used by rest of application
                 windo.localStorage.removeItem('random-chooser-saveable-test', 'success');
             }
         } catch (e) {
@@ -69,13 +69,13 @@ var $, window, randomChooser = ( function(win) {
           return selectedListName;
         },
         isItemNameUniqueInSelectedList : function(itemName) {
-          var i, currentlySelectedList = checkListIsSelected();
-          for( i = 0; i < currentlySelectedList.length; i += 1 ) {
-            if(currentlySelectedList[i] === itemName) {
-              return false;
+          var isUnique = true;
+          $(checkListIsSelected()).each( function (index, element) {
+            if(element === itemName) {
+              isUnique = false;
             }
-          }
-          return true;
+          });
+          return isUnique;
         },
         getListNames : function() {
           var listNames = [], i;
@@ -92,13 +92,12 @@ var $, window, randomChooser = ( function(win) {
           db.setItem('random-chooser-lists', JSON.stringify(lists));
         },
         deleteItem : function(itemName) {
-          var i, list = checkListIsSelected(), item;
-          for( i = 0; i < list.length; i += 1) {
-            item = list[i];
-            if(item === itemName) {
-              list.splice(i, 1);
+          var list = checkListIsSelected();
+          $(list).each( function (index, element) {
+            if(element === itemName) {
+              list.splice(index, 1);
             }
-          }
+          });
           db.setItem('random-chooser-lists', JSON.stringify(lists));
         },
         getSelectedList : function() {
@@ -111,7 +110,7 @@ var $, window, randomChooser = ( function(win) {
     }
     
     function createView () {
-      var createDeleteAnchor = function (anchorText) {
+     function createDeleteAnchor (anchorText) {
         return $('<a/>', {
           'href' : '#deletePage',
           'data-role' : 'button', 
@@ -119,7 +118,7 @@ var $, window, randomChooser = ( function(win) {
           'data-transition' : 'pop',
           'text' : anchorText
         });
-      };
+      }
       function addToList (viewAnchorText, deleteAnchorText, htmlListId, deleteClick, viewClick, viewPageId) {
         var listViewAnchor, deleteListAnchor;
         listViewAnchor = $('<a/>', {
@@ -137,35 +136,43 @@ var $, window, randomChooser = ( function(win) {
       function addList (listName, deleteClick, viewClick) {
         addToList(listName, 'Delete List', '#lists', deleteClick, viewClick, '#viewListPage');
       }
-      function addItem (listName, deleteClick) {
-        addToList(listName, 'Delete Item', '#listItems', deleteClick, function(){});
+      function addItem (listName, deleteClick, viewClick) {
+        addToList(listName, 'Delete Item', '#listItems', deleteClick, viewClick);
+      }
+      function redrawList (list, ul, addF) {
+        ul.empty();
+        ul.listview('refresh');
+        $(list).each( function (index, element) {
+          addF(element.name, element.deleteClick, element.viewClick);
+        });
+        ul.listview('refresh');
+      }
+      function ifEnterInvokeClickHandler (event, element, page) {
+        if((event.keyCode === 13 || event.which === 13) && element[0].className.indexOf('ui-disabled') === -1) {
+          element.click();
+        }
+        if(event.keyCode === 27 || event.which === 27) {
+          page.dialog('close');
+        }
+        return false;
       }
       return {
         redrawLists : function(list) {
-          var i = 0, lists = $('#lists');
-          lists.empty();
-          lists.listview('refresh');
-          for(; i < list.length; i++) {
-            addList(list[i].name, list[i].deleteClick, list[i].viewClick);
-          }
-          lists.listview('refresh');
+          redrawList(list, $('#lists'), function (name, deleteClick, viewClick) {
+            addList(name, deleteClick, viewClick);
+          });
         },
         addList : function(listName, deleteClick, viewClick) {
           addList(listName, deleteClick, viewClick);
         },
-        addItem : function(itemName, deleteClick) {
-          addItem(itemName, deleteClick);
+        addItem : function(itemName, deleteClick, viewClick) {
+          addItem(itemName, deleteClick, viewClick);
         },
         drawList : function(listName, list) {
-          var i;
           $('#listNameLabel').text("list: " + listName);
-          $('#listItems').empty();
-          $('#listItems').listview('refresh');
-          list.sort();
-          for(i = 0; i < list.length; i++) {
-            addItem(list[i].name, list[i].deleteClick);
-          }
-          $('#listItems').listview('refresh');
+          redrawList(list, $('#listItems'), function (name, deleteClick, viewClick) {
+            addItem(name, deleteClick, viewClick);
+          });
         },
         setRandomDisabled : function(disabled) {
           if(disabled) {
@@ -180,21 +187,15 @@ var $, window, randomChooser = ( function(win) {
         askToDelete : function(name, deleteClick) {
           var deleteButton = $('#delete'), deletePage = $('#deletePage'), deleteLabel = $('#deleteLabel');
           deleteLabel.text(name);
-          deleteButton.unbind('click');
-          deleteButton.click(deleteClick);
-          deleteButton.click(function () {
+          deleteButton.unbind('click').click(deleteClick).click(function () {
             deletePage.dialog('close');
           });
-          deletePage.unbind('keyup');
-          deletePage.bind('keyup', function(event) {
-            if(event.keyCode === 13 || event.which === 13) {
-              deleteButton.click();
-            }
-            if(event.keyCode === 27 || event.which === 27) {
-              deletePage.dialog('close');
-            }
-            return false;
+          deletePage.unbind('keyup').bind('keyup', function(event) {
+            return ifEnterInvokeClickHandler(event, deleteButton, deletePage);
           });
+        },
+        ifEnterInvokeClickHandler : function (event, button, page) {
+          ifEnterInvokeClickHandler(event, button, page);
         }
       };
     }
@@ -215,23 +216,23 @@ var $, window, randomChooser = ( function(win) {
       function createLineItemModels (names, deleteF, viewF) {
         var lists = [], i;
         names.sort();
-        for (i = 0; i < names.length; i += 1) {
-            lists.push({
-              name : names[i],
+        $(names).each( function (index, element) {
+          lists.push({
+              name : element,
               deleteClick : function() {
-                view.askToDelete(names[i], function(){
-                  deleteF(names[i]);
+                view.askToDelete(element, function(){
+                  deleteF(element);
                 });
               },
               viewClick : function() {
-                viewF(names[i]);
+                viewF(element);
               } 
             });
-        }
+        });
         return lists;
       }
       function drawList(listName) {
-        var list = [], listItems = model.getList(listName), i;
+        var list = [], listItems = model.getList(listName), i, viewFunction = function () {};
         if(listItems === undefined){ // probably a page refresh - go back to first page
           $.mobile.changePage('#firstPage', {
             reverse: true
@@ -240,7 +241,7 @@ var $, window, randomChooser = ( function(win) {
         }
         view.drawList( listName, createLineItemModels(listItems, function(itemName) {
           deleteItem(itemName);
-        }, function(itemName) {}));
+        }, viewFunction));
       }
       function drawSelectedList() {
         drawList(model.getSelectedListName());
@@ -272,15 +273,6 @@ var $, window, randomChooser = ( function(win) {
       function disableAddItem (itemName) {
         return itemName.length === 0 || !model.isItemNameUniqueInSelectedList(itemName);
       }
-      function ifEnterInvokeClickHandler (event, element, page) {
-        if((event.keyCode === 13 || event.which === 13) && element[0].className.indexOf('ui-disabled') === -1) {
-          element.click();
-        }
-        if(event.keyCode === 27 || event.which === 27) {
-          page.dialog('close');
-        }
-        return false;
-      }
       function initAddPage (addOkId, textFieldId, dialogId, disableAddF, addF) {
         var addOk = $(addOkId), name, dialog = $(dialogId);
         addOk.addClass('ui-disabled');
@@ -296,7 +288,7 @@ var $, window, randomChooser = ( function(win) {
           addF(name);
         });
         dialog.bind('keyup', function(event) {
-          return ifEnterInvokeClickHandler(event, addOk, dialog);
+          return view.ifEnterInvokeClickHandler(event, addOk, dialog);
         });
       }
       return {
@@ -310,11 +302,11 @@ var $, window, randomChooser = ( function(win) {
           enableDisableRandom();
         },
         selectRandomItem : function() {
-          var randomlySelectedItem = model.getSelectedList()[Math.floor(Math.random() * model.getSelectedList().length)];
-          view.displayItem(randomlySelectedItem);
+          var list = model.getSelectedList();
+          view.displayItem(list[Math.floor(Math.random() * list.length)]);
         },
         ifEnterInvokeClickHandler : function (event, element, page) {
-          return ifEnterInvokeClickHandler(event, element, page);
+          return view.ifEnterInvokeClickHandler(event, element, page);
         },
         initAddListPage : function () {
           initAddPage('#addListOk', '#listName', '#addListPage', disableAddList, function (text){
@@ -378,7 +370,7 @@ var $, window, randomChooser = ( function(win) {
     $('#addItemPage').live('pageshow', function (event, ui) {
         $('#itemName').focus();
     });
-    // despite not using global name space & being immutable, keep the application is testable
+    // despite not using global name space & being immutable, keep the application testable
     return {
         createModel : createModel,
         createView : createView,
