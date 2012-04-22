@@ -135,8 +135,8 @@ var $, window, randomChooser = (function (win) {
         function addList(listName, deleteClick, viewClick) {
             addToList(listName, 'Delete List', '#lists', deleteClick, viewClick, '#viewListPage');
         }
-        function addItem(listName, deleteClick, viewClick) {
-            addToList(listName, 'Delete Item', '#listItems', deleteClick, viewClick);
+        function addItem(itemName, deleteClick, viewClick) {
+            addToList(itemName, 'Delete Item', '#listItems', deleteClick, viewClick);
         }
         function redrawList(list, ul, addF) {
             ul.empty();
