@@ -14,7 +14,11 @@
 				<h1>random chooser</h1>
 			</div>
 			<div data-role="content">
-				<a href="#addListPage"data-role="button" data-rel="dialog" data-transition="pop">Add List</a>
+			  <div data-role="controlgroup" data-type="horizontal" style="text-align: center">
+          <a href="#addListPage" data-role="button" data-rel="dialog" data-transition="pop">Add List</a>
+          <a href="#importListsPage" data-role="button" data-rel="dialog" data-transition="pop">Import Lists</a>
+          <a href="#exportListsPage" data-role="button" data-rel="dialog" data-transition="pop">Export Lists</a>
+        </div>
 				<br/>	
 				<ul data-role="listview" data-split-icon="delete" data-split-theme="d" id="lists">
 				</ul>
@@ -72,6 +76,36 @@
       <div data-role="content">
         <h1 id="deleteLabel" align="center"></h1>
         <a data-role="button" id="delete">Yes</a>
+      </div>
+    </div>
+    <!-- import/export dialogs -->
+    <div data-role="page" id="importListsPage">
+      <div data-role="header">
+        <h1>import</h1>
+      </div>
+      <div data-role="content">
+        <div id="importTextPage">
+          <div data-role="fieldcontain" class="ui-hide-label">
+            <label for="listsData">Lists data:</label>
+            <textarea name="listsData" id="listsData" value="" placeholder="Lists Data"></textarea>
+          </div>
+        </div>
+        <div id="importErrorText" style="color: red;"></div>
+        <a href="#firstPage" data-role="button" id="import">OK</a>
+      </div>
+    </div>
+    <div data-role="page" id="exportListsPage">
+      <div data-role="header">
+        <h1>export</h1>
+      </div>
+      <div data-role="content">
+        <div id="exportTextPage">
+          <div data-role="fieldcontain" class="ui-hide-label">
+            <label for="exportListsData">Lists data:</label>
+            <textarea name="exportListsData" id="exportListsData" value=""></textarea>
+          </div>
+        </div>
+        <a href="#firstPage" data-role="button" id="export">Back</a>
       </div>
     </div>
 	</body>

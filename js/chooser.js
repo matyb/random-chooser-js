@@ -105,6 +105,9 @@ var $, window, randomChooser = (function (win) {
             },
             getList : function (listName) {
                 return getList(listName);
+            },
+            getDbJSONString : function () {
+                return db.getItem('random-chooser-lists');
             }
         };
     }
@@ -315,6 +318,32 @@ var $, window, randomChooser = (function (win) {
                 initAddPage('#addItemOk', '#itemName', '#addItemPage', disableAddItem, function (text) {
                     addItemToSelectedList(text);
                 });
+            },
+            getDbJSONString : function () {
+                return model.getDbJSONString();
+            },
+            importLists : function (listsJSONText) {
+                var listsToImport, importProp, i, existingList, newList;
+                try{
+                    listsToImport = JSON.parse(listsJSONText);
+                } catch(x) {
+                    win.alert("The text was not in proper JSON format, please double check and try again.");
+                    return false;
+                }
+                for(importProp in listsToImport){
+                    newList = listsToImport[importProp];
+                    if(listsToImport.hasOwnProperty(importProp)){
+                        if(model.getList(importProp) === undefined){ // new list
+                            model.addList(importProp);
+                        }
+                        model.setSelectedListName(importProp);
+                        for (i = 0; i < newList.length; i += 1) {
+                            if(model.isItemNameUniqueInSelectedList(newList[i])){
+                                model.addItem(newList[i]);
+                            }
+                        }
+                    }
+                }
             }
         };
     }
@@ -343,6 +372,28 @@ var $, window, randomChooser = (function (win) {
             return controller.ifEnterInvokeClickHandler(event, selectAnother, $('#viewItemPage'));
         });
     });
+    $('#importListsPage').live('pageinit', function () {
+        $('#import').addClass('ui-disabled');
+        $('#listsData').keyup(function (){
+            if($('#listsData').val().trim().length === 0) {
+                $('#import').addClass('ui-disabled');
+            }else{
+                $('#import').removeClass('ui-disabled');
+            }
+        });
+        $('#import').click(function () {
+            controller.importLists($('#listsData').val().trim());
+        });
+    });
+    $('#exportListsPage').live('pageinit', function () {
+      var exportListsData = $('#exportListsData');
+      exportListsData.click(function (){
+         exportListsData.select();
+      });
+      exportListsData.keypress(function () {
+          return false;
+      });
+    });
     $('#viewListPage').live('pagebeforeshow', function () {
         controller.enableDisableRandom();
         controller.drawSelectedList();
@@ -360,6 +411,16 @@ var $, window, randomChooser = (function (win) {
     });
     $('#addItemPage').live('pageshow', function () {
         $('#itemName').focus();
+    });
+    $('#importListsPage').live('pagehide', function () {
+        $('#import').addClass('ui-disabled');
+        $('#listsData').val("");
+    });
+    $('#exportListsPage').live('pageshow', function () {
+        $('#exportListsData').val(controller.getDbJSONString());
+    });
+    $('#exportListsPage').live('pagehide', function () {
+        $('#exportListsData').val("");
     });
     // despite not using global name space & being immutable, keep the application testable
     return {
