@@ -5,7 +5,7 @@ var $, window, randomChooser = (function (win) {
         throw 'jquery is required, please include it before this script';
     }
     function createLocalStorage(windo) {
-        var isLocalStorageSupported =  window.localStorage !== undefined, localStorage;
+        var isLocalStorageSupported =  windo.localStorage !== undefined, localStorage;
         if (isLocalStorageSupported) {
             try {
                 windo.localStorage.setItem('random-chooser-saveable-test', 'success');
