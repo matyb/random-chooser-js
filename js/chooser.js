@@ -165,7 +165,7 @@ var $, window, randomChooser = (function (win) {
             });
             ul.listview('refresh');
         }
-        function ifEnterInvokeClickHandler(event, element, page) {
+        function ifEnterClickEscClose(event, element, page) {
             if ((event.keyCode === 13 || event.which === 13) && element[0].className.indexOf('ui-disabled') === -1) {
                 element.click();
             }
@@ -220,11 +220,11 @@ var $, window, randomChooser = (function (win) {
                     deletePage.dialog('close');
                 });
                 deletePage.unbind('keyup').bind('keyup', function (event) {
-                    return ifEnterInvokeClickHandler(event, deleteButton, deletePage);
+                    return ifEnterClickEscClose(event, deleteButton, deletePage);
                 });
             },
-            ifEnterInvokeClickHandler : function (event, button, page) {
-                ifEnterInvokeClickHandler(event, button, page);
+            ifEnterClickEscClose : function (event, button, page) {
+                ifEnterClickEscClose(event, button, page);
             },
             clearImportErrorText : function (){
                 setImportErrorText("");
@@ -331,7 +331,7 @@ var $, window, randomChooser = (function (win) {
                 addF();
             });
             dialog.bind('keyup', function (event) {
-                return view.ifEnterInvokeClickHandler(event, addOk, dialog);
+                return view.ifEnterClickEscClose(event, addOk, dialog);
             });
         }
         return {
@@ -348,8 +348,8 @@ var $, window, randomChooser = (function (win) {
                 var list = model.getSelectedList();
                 view.displayItem(list[Math.floor(Math.random() * list.length)]);
             },
-            ifEnterInvokeClickHandler : function (event, element, page) {
-                return view.ifEnterInvokeClickHandler(event, element, page);
+            ifEnterClickEscClose : function (event, element, page) {
+                return view.ifEnterClickEscClose(event, element, page);
             },
             initAddListPage : function () {
                 initAddPage('#addListOk', ['#listName'], '#addListPage', disableAddList, function () {
@@ -437,7 +437,7 @@ var $, window, randomChooser = (function (win) {
             controller.selectRandomItem();
         });
         $("#viewItemPage").bind('keyup', function (event) {
-            return controller.ifEnterInvokeClickHandler(event, selectAnother, $('#viewItemPage'));
+            return controller.ifEnterClickEscClose(event, selectAnother, $('#viewItemPage'));
         });
     });
     $('#importListsPage').live('pageinit', function () {
@@ -456,7 +456,7 @@ var $, window, randomChooser = (function (win) {
             }
         });
         $("#importListsPage").bind('keyup', function (event) {
-            return controller.ifEnterInvokeClickHandler(event, $('#import'), $('#importListsPage'));
+            return controller.ifEnterClickEscClose(event, $('#import'), $('#importListsPage'));
         });
     });
     $('#exportListsPage').live('pageinit', function () {
@@ -468,7 +468,7 @@ var $, window, randomChooser = (function (win) {
           return false;
       });
       $("#exportListsPage").bind('keyup', function (event) {
-            return controller.ifEnterInvokeClickHandler(event, $('#export'), $('#exportListsPage'));
+            return controller.ifEnterClickEscClose(event, $('#export'), $('#exportListsPage'));
       });
     });
     $('#viewListPage').live('pagebeforeshow', function () {
