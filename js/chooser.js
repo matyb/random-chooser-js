@@ -311,6 +311,10 @@ var $, window, randomChooser = (function (win) {
         function disableAddItem(itemName) {
             return itemName.length === 0 || !model.isItemNameUniqueInSelectedList(itemName);
         }
+        function disableAddGenerate() {
+            var fromText = $('#from').val().trim(), toText = $('#to').val().trim();
+            return fromText.length === 0 || toText.length === 0 || +fromText > +toText;
+        }
         function initAddPage(addOkId, textFieldIds, dialogId, disableAddF, addF) {
             var addOk = $(addOkId), dialog = $(dialogId);
             addOk.addClass('ui-disabled');
@@ -362,10 +366,7 @@ var $, window, randomChooser = (function (win) {
                 });
             },
             initGenerateItemsPage : function () {
-                initAddPage('#addItemsOk', ['#from','#to'], '#generateItemsPage', function (){
-                    var fromText = $('#from').val().trim(), toText = $('#to').val().trim();
-                    return fromText.length === 0 || toText.length === 0 || +fromText > +toText;
-                }, function () {
+                initAddPage('#addItemsOk', ['#from','#to'], '#generateItemsPage', disableAddGenerate, function () {
                     var fromText = $('#from').val().trim(), toText = $('#to').val().trim(), f, t, list, fString;
                     list = model.getSelectedList();
                     f = Math.max(+fromText, 0);
