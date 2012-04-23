@@ -424,6 +424,15 @@ var $, window, randomChooser = (function (win) {
         controller.initAddItemPage();
     });
     $('#generateItemsPage').live('pageinit', function () {
+        var restrictToNumbers = function (event) {
+            var charCode = event.which || event.keyCode;
+            if (charCode > 31 && (charCode < 48 || charCode > 57)){
+                return false;
+            }
+            return true;
+        };
+        $('#from').keydown(restrictToNumbers);
+        $('#to').keydown(restrictToNumbers);
         controller.initGenerateItemsPage();
     });
     $('#viewListPage').live('pageinit', function () {
