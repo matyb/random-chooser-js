@@ -119,11 +119,11 @@ $(document).ready(function(){
     deleteAnchor.onclick();
   });
   test("drawList - sets list name as title", 1, function() {
-    var listNameLabel = $('#listNameLabel');
+    var listNameLabel = $('.listNameLabel');
     $('#listItems').constructor.prototype.listview = function(refresh) {};
-    listNameLabel.text = '';
+    listNameLabel.text('');
     randomChooser.createView().drawList('1', []);
-    equal( $('#listNameLabel').text(), 'list: 1');
+    equal( listNameLabel.text(), 'list: 1');
   });
   test("drawList - draws item for each name in array", 2, function() {
     var list = $('#listItems');
@@ -185,6 +185,28 @@ $(document).ready(function(){
     deleteListPage.trigger('focus');
     deleteListPage.trigger(press);
   });
+  test("setImportErrorText - string of positive length shows error message", 3, function() {
+    equal($('#importErrorText').text(), '');
+    $('#importErrorText').constructor.prototype.show = function() {
+      ok(true);
+    }
+    $('#importErrorText').constructor.prototype.hide = function() {
+      throw "should be shown";
+    }
+    randomChooser.createView().setImportErrorText("some error");
+    equal($('#importErrorText').text(), 'some error');
+  });
+  test("clearImportErrorText - clears and hides error text", function() {
+    $('#importErrorText').text('some error');
+    $('#importErrorText').constructor.prototype.hide = function() {
+      ok(true);
+    }
+    $('#importErrorText').constructor.prototype.show = function() {
+      throw "should be hidden";
+    }
+    randomChooser.createView().clearImportErrorText();
+    equal($('#importErrorText').text(), '');
+  });
 });
   </script>
   
@@ -221,7 +243,7 @@ $(document).ready(function(){
     </div>
     <div data-role="page" id="viewListPage">
       <div data-role="header">
-        <h1 id="listNameLabel"></h1>
+        <h1 class="listNameLabel"></h1>
       </div>
       <div data-role="content">
         <a href="#addItemPage" data-role="button" data-rel="dialog" data-transition="pop">Add Item</a>
@@ -259,6 +281,35 @@ $(document).ready(function(){
       <div data-role="content">
         <h1 id="deleteLabel" align="center"></h1>
         <a data-role="button" id="delete">Yes</a>
+      </div>
+    </div>
+    <div data-role="page" id="importListsPage">
+      <div data-role="header">
+        <h1>import</h1>
+      </div>
+      <div data-role="content">
+        <div id="importTextPage">
+          <div data-role="fieldcontain" class="ui-hide-label">
+            <label for="listsData">Lists data:</label>
+            <textarea name="listsData" id="listsData" value="" placeholder="Lists Data"></textarea>
+          </div>
+        </div>
+        <div id="importErrorText" style="color: red;"></div>
+        <a href="#" data-role="button" id="import">OK</a>
+      </div>
+    </div>
+    <div data-role="page" id="exportListsPage">
+      <div data-role="header">
+        <h1>export</h1>
+      </div>
+      <div data-role="content">
+        <div id="exportTextPage">
+          <div data-role="fieldcontain" class="ui-hide-label">
+            <label for="exportListsData">Lists data:</label>
+            <textarea name="exportListsData" id="exportListsData" value=""></textarea>
+          </div>
+        </div>
+        <a href="#firstPage" data-role="button" id="export">Back</a>
       </div>
     </div>
  </div>

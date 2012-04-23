@@ -35,7 +35,7 @@ var $, window, randomChooser = (function (win) {
         return localStorage;
     }
     function createModel(db) {
-        var lists, selectedListName;
+        var lists, selectedListName, dbGlobal = 'random-chooser-lists';
         function checkListIsSelected() {
             var currentlySelectedList = lists[selectedListName];
             if (currentlySelectedList === undefined) {
@@ -46,21 +46,37 @@ var $, window, randomChooser = (function (win) {
         function getList(listName) {
             return lists[listName];
         }
-        lists = db.getItem('random-chooser-lists');
+        function getDbJSONString() {
+            return db.getItem(dbGlobal);
+        }
+        function save(){
+            db.setItem(dbGlobal, JSON.stringify(lists));
+        }
+        function addItemToList(list, itemName){
+            list[list.length] = itemName;
+        }
+        function isItemNameUniqueInList(list, itemName){
+            var isUnique = true;
+            $(list).each(function (index, element) {
+                if (element === itemName) {
+                    isUnique = false;
+                }
+            });
+            return isUnique;
+        }
+        lists = getDbJSONString();
         if (lists === null || lists === undefined) {
             lists = {};
-            db.setItem('random-chooser-lists', JSON.stringify(lists));
+            save();
         } else {
             lists = JSON.parse(lists);
         }
         return {
             addList : function (listName) {
                 lists[listName] = [];
-                db.setItem('random-chooser-lists', JSON.stringify(lists));
             },
             deleteList : function (listName) {
                 delete lists[listName];
-                db.setItem('random-chooser-lists', JSON.stringify(lists));
             },
             setSelectedListName : function (listName) {
                 selectedListName = listName;
@@ -69,13 +85,10 @@ var $, window, randomChooser = (function (win) {
                 return selectedListName;
             },
             isItemNameUniqueInSelectedList : function (itemName) {
-                var isUnique = true;
-                $(checkListIsSelected()).each(function (index, element) {
-                    if (element === itemName) {
-                        isUnique = false;
-                    }
-                });
-                return isUnique;
+                return isItemNameUniqueInList(checkListIsSelected(), itemName);
+            },
+            isItemNameUniqueInList : function (list, itemName) {
+                return isItemNameUniqueInList(list, itemName);
             },
             getListNames : function () {
                 var listNames = [], i;
@@ -87,9 +100,10 @@ var $, window, randomChooser = (function (win) {
                 return listNames;
             },
             addItem : function (itemName) {
-                var currentlySelectedList = checkListIsSelected();
-                currentlySelectedList[currentlySelectedList.length] = itemName;
-                db.setItem('random-chooser-lists', JSON.stringify(lists));
+                addItemToList(checkListIsSelected(), itemName);
+            },
+            addItemToList : function (list, itemName) {
+                addItemToList(list, itemName);
             },
             deleteItem : function (itemName) {
                 var list = checkListIsSelected();
@@ -98,7 +112,6 @@ var $, window, randomChooser = (function (win) {
                         list.splice(index, 1);
                     }
                 });
-                db.setItem('random-chooser-lists', JSON.stringify(lists));
             },
             getSelectedList : function () {
                 return getList(selectedListName);
@@ -107,7 +120,10 @@ var $, window, randomChooser = (function (win) {
                 return getList(listName);
             },
             getDbJSONString : function () {
-                return db.getItem('random-chooser-lists');
+                return getDbJSONString();
+            },
+            save : function () {
+              save();
             }
         };
     }
@@ -158,6 +174,17 @@ var $, window, randomChooser = (function (win) {
             }
             return false;
         }
+        function setImportErrorText (text) {
+            if(!text){
+                text = "";
+            }
+            $('#importErrorText').text(text);
+            if (text.trim().length > 0) {
+                $('#importErrorText').show();
+            }else{
+                $('#importErrorText').hide();
+            }
+        }
         return {
             redrawLists : function (list) {
                 redrawList(list, $('#lists'), function (name, deleteClick, viewClick) {
@@ -171,7 +198,7 @@ var $, window, randomChooser = (function (win) {
                 addItem(itemName, deleteClick, viewClick);
             },
             drawList : function (listName, list) {
-                $('#listNameLabel').text("list: " + listName);
+                $('.listNameLabel').text("list: " + listName);
                 redrawList(list, $('#listItems'), function (name, deleteClick, viewClick) {
                     addItem(name, deleteClick, viewClick);
                 });
@@ -198,6 +225,12 @@ var $, window, randomChooser = (function (win) {
             },
             ifEnterInvokeClickHandler : function (event, button, page) {
                 ifEnterInvokeClickHandler(event, button, page);
+            },
+            clearImportErrorText : function (){
+                setImportErrorText("");
+            },
+            setImportErrorText : function (text) {
+                setImportErrorText(text);
             }
         };
     }
@@ -209,6 +242,7 @@ var $, window, randomChooser = (function (win) {
         function addList(listName) {
             if (model.getList(listName) === undefined) {
                 model.addList(listName);
+                model.save();
                 redrawFirstPage();
                 return true;
             }
@@ -249,10 +283,12 @@ var $, window, randomChooser = (function (win) {
         }
         function addItemToSelectedList(itemName) {
             model.addItem(itemName);
+            model.save();
             drawSelectedList();
         }
         function deleteList(listName) {
             model.deleteList(listName);
+            model.save();
             redrawFirstPage();
         }
         function enableDisableRandom() {
@@ -260,6 +296,7 @@ var $, window, randomChooser = (function (win) {
         }
         deleteItem = function (itemName) {
             model.deleteItem(itemName);
+            model.save();
             enableDisableRandom();
             drawSelectedList();
         };
@@ -274,19 +311,24 @@ var $, window, randomChooser = (function (win) {
         function disableAddItem(itemName) {
             return itemName.length === 0 || !model.isItemNameUniqueInSelectedList(itemName);
         }
-        function initAddPage(addOkId, textFieldId, dialogId, disableAddF, addF) {
-            var addOk = $(addOkId), name, dialog = $(dialogId);
+        function initAddPage(addOkId, textFieldIds, dialogId, disableAddF, addF) {
+            var addOk = $(addOkId), dialog = $(dialogId);
             addOk.addClass('ui-disabled');
-            $(textFieldId).bind('keyup', function () {
-                name = $(textFieldId).val().trim();
-                if (disableAddF(name)) {
-                    addOk.addClass('ui-disabled');
-                } else {
-                    addOk.removeClass('ui-disabled');
-                }
+            $(textFieldIds).each(function(index, textFieldId){
+                (function(){
+                    var name;
+                    $(textFieldId).bind('keyup', function () {
+                        name = $(textFieldId).val().trim();
+                        if (disableAddF(name)) {
+                            addOk.addClass('ui-disabled');
+                        } else {
+                            addOk.removeClass('ui-disabled');
+                        }
+                    });
+                }());
             });
             addOk.click(function () {
-                addF(name);
+                addF();
             });
             dialog.bind('keyup', function (event) {
                 return view.ifEnterInvokeClickHandler(event, addOk, dialog);
@@ -310,40 +352,63 @@ var $, window, randomChooser = (function (win) {
                 return view.ifEnterInvokeClickHandler(event, element, page);
             },
             initAddListPage : function () {
-                initAddPage('#addListOk', '#listName', '#addListPage', disableAddList, function (text) {
-                    addList(text);
+                initAddPage('#addListOk', ['#listName'], '#addListPage', disableAddList, function () {
+                    addList($('#listName').val().trim());
                 });
             },
             initAddItemPage : function () {
-                initAddPage('#addItemOk', '#itemName', '#addItemPage', disableAddItem, function (text) {
-                    addItemToSelectedList(text);
+                initAddPage('#addItemOk', ['#itemName'], '#addItemPage', disableAddItem, function () {
+                    addItemToSelectedList($('#itemName').val().trim());
+                });
+            },
+            initGenerateItemsPage : function () {
+                initAddPage('#addItemsOk', ['#from','#to'], '#generateItemsPage', function (){
+                    var fromText = $('#from').val().trim(), toText = $('#to').val().trim();
+                    return fromText.length === 0 || toText.length === 0 || +fromText > +toText;
+                }, function () {
+                    var fromText = $('#from').val().trim(), toText = $('#to').val().trim(), f, t, list, fString;
+                    list = model.getSelectedList();
+                    f = Math.max(+fromText, 0);
+                    t = Math.min(+toText, 999); // 1000 li's is pushing it
+                    for(f; f <= t; f += 1){
+                        fString = ''+f;
+                        if (model.isItemNameUniqueInList(list, fString)) {
+                          model.addItemToList(list, fString);
+                        }
+                    }
+                    model.save();
                 });
             },
             getDbJSONString : function () {
                 return model.getDbJSONString();
             },
-            importLists : function (listsJSONText) {
-                var listsToImport, importProp, i, existingList, newList;
+            importLists : function (listsJSONText) {                
+                var listsToImport, importProp, i, list, newList;
+                view.clearImportErrorText();
                 try{
                     listsToImport = JSON.parse(listsJSONText);
                 } catch(x) {
-                    win.alert("The text was not in proper JSON format, please double check and try again.");
+                    view.setImportErrorText("The text isn't in a proper JSON format, please correct this and try again.");
                     return false;
                 }
                 for(importProp in listsToImport){
                     newList = listsToImport[importProp];
                     if(listsToImport.hasOwnProperty(importProp)){
-                        if(model.getList(importProp) === undefined){ // new list
+                        list = model.getList(importProp);
+                        if(list === undefined){ // new list
                             model.addList(importProp);
+                            list = model.getList(importProp);
                         }
-                        model.setSelectedListName(importProp);
                         for (i = 0; i < newList.length; i += 1) {
-                            if(model.isItemNameUniqueInSelectedList(newList[i])){
-                                model.addItem(newList[i]);
+                            if(model.isItemNameUniqueInList(list, newList[i])){
+                                model.addItemToList(list, newList[i]);
                             }
                         }
+                        
                     }
                 }
+                model.save();
+                return true;
             }
         };
     }
@@ -357,6 +422,9 @@ var $, window, randomChooser = (function (win) {
     });
     $('#addItemPage').live('pageinit', function () {
         controller.initAddItemPage();
+    });
+    $('#generateItemsPage').live('pageinit', function () {
+        controller.initGenerateItemsPage();
     });
     $('#viewListPage').live('pageinit', function () {
         $('#random').click(function () {
@@ -382,7 +450,13 @@ var $, window, randomChooser = (function (win) {
             }
         });
         $('#import').click(function () {
-            controller.importLists($('#listsData').val().trim());
+            if (controller.importLists($('#listsData').val().trim())) {
+                controller.redrawFirstPage();
+                $('#importListsPage').dialog('close');
+            }
+        });
+        $("#importListsPage").bind('keyup', function (event) {
+            return controller.ifEnterInvokeClickHandler(event, $('#import'), $('#importListsPage'));
         });
     });
     $('#exportListsPage').live('pageinit', function () {
@@ -392,6 +466,9 @@ var $, window, randomChooser = (function (win) {
       });
       exportListsData.keypress(function () {
           return false;
+      });
+      $("#exportListsPage").bind('keyup', function (event) {
+            return controller.ifEnterInvokeClickHandler(event, $('#export'), $('#exportListsPage'));
       });
     });
     $('#viewListPage').live('pagebeforeshow', function () {
@@ -405,6 +482,14 @@ var $, window, randomChooser = (function (win) {
     $('#addListPage').live('pageshow', function () {
         $('#listName').focus();
     });
+    $('#generateItemsPage').live('pageshow', function () {
+        $('#from').focus();
+    });
+    $('#generateItemsPage').live('pagehide', function () {
+        $('#from').val('');
+        $('#to').val('');
+        $('#addItemsOk').addClass('ui-disabled');
+    });
     $('#addItemPage').live('pagehide', function () {
         $('#itemName').val('');
         $('#addItemOk').addClass('ui-disabled');
@@ -412,12 +497,18 @@ var $, window, randomChooser = (function (win) {
     $('#addItemPage').live('pageshow', function () {
         $('#itemName').focus();
     });
+    $('#importListsPage').live('pageshow', function () {
+        $('#listsData').focus();
+    });
     $('#importListsPage').live('pagehide', function () {
         $('#import').addClass('ui-disabled');
         $('#listsData').val("");
+        $('#importErrorText').hide("");
     });
     $('#exportListsPage').live('pageshow', function () {
         $('#exportListsData').val(controller.getDbJSONString());
+        $('#exportListsData').focus();
+        $('#exportListsData').select();
     });
     $('#exportListsPage').live('pagehide', function () {
         $('#exportListsData').val("");

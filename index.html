@@ -16,8 +16,8 @@
 			<div data-role="content">
 			  <div data-role="controlgroup" data-type="horizontal" style="text-align: center">
           <a href="#addListPage" data-role="button" data-rel="dialog" data-transition="pop">Add List</a>
-          <a href="#importListsPage" data-role="button" data-rel="dialog" data-transition="pop">Import Lists</a>
-          <a href="#exportListsPage" data-role="button" data-rel="dialog" data-transition="pop">Export Lists</a>
+          <a href="#importListsPage" data-role="button" data-rel="dialog" data-transition="pop">Import</a>
+          <a href="#exportListsPage" data-role="button" data-rel="dialog" data-transition="pop">Export</a>
         </div>
 				<br/>	
 				<ul data-role="listview" data-split-icon="delete" data-split-theme="d" id="lists">
@@ -38,16 +38,36 @@
 		</div>
 		<div data-role="page" id="viewListPage">
 			<div data-role="header">
-				<h1 id="listNameLabel"></h1>
+				<h1 class="listNameLabel"></h1>
 			</div>
 			<div data-role="content">
-				<a href="#addItemPage" data-role="button" data-rel="dialog" data-transition="pop">Add Item</a>
+			  <div data-role="controlgroup" data-type="horizontal" style="text-align: center">
+          <a href="#addItemPage" data-role="button" data-rel="dialog" data-transition="pop">Add Item</a>
+          <a href="#generateItemsPage" data-role="button" data-rel="dialog" data-transition="pop">Generate Items</a>
+        </div>
 				<a href="#viewItemPage" data-role="button" data-rel="dialog" data-transition="pop" id="random">Select at Random</a>
 				<br/>	
 				<ul data-role="listview" data-split-icon="delete" data-split-theme="d" id="listItems">
 				</ul>
 			</div>
 		</div>
+		<div data-role="page" id="generateItemsPage">
+      <div data-role="header">
+        <h1>generate items</h1>
+      </div>
+      <div data-role="content">
+        <h1 class="listNameLabel"></h1>
+        <div data-role="fieldcontain" class="ui-hide-label">
+          <div data-role="controlgroup" data-type="horizontal" style="text-align: center">
+            <label for="from">From:</label>
+            <input type="text" name="from" id="from" value="" placeholder="From" style="width:45%;display:inline-block" maxlength='3'/>
+            <label for="to">To:</label>
+            <input type="text" name="to" id="to" value="" placeholder="To" style="width:45%;display:inline-block" maxlength='3'/>
+          </div>
+        </div>
+        <a id="addItemsOk" href="#" data-role="button" data-rel="back" data-theme="c">OK</a>
+      </div>
+    </div>
 		<div data-role="page" id="addItemPage">
 			<div data-role="header">
 				<h1>add item</h1>
@@ -91,7 +111,7 @@
           </div>
         </div>
         <div id="importErrorText" style="color: red;"></div>
-        <a href="#firstPage" data-role="button" id="import">OK</a>
+        <a href="#" data-role="button" id="import">OK</a>
       </div>
     </div>
     <div data-role="page" id="exportListsPage">

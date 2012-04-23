@@ -86,6 +86,141 @@
     };
     randomChooser.createController(model, view).selectRandomItem();
   });
+  test("getDbJSONString - delegates to model", 2, function() {
+    var model = {
+      getDbJSONString : function () {
+        ok(true);
+        return "{}";
+      }
+    };
+    equal("{}", randomChooser.createController(model, {}).getDbJSONString());
+  });
+  test("importLists - clears view's error text first", 1, function() {
+    var model = {
+      save : function () {}
+    }, view = {
+      clearImportErrorText : function () {
+        ok(true);
+      }
+    };
+    randomChooser.createController(model, view).importLists("{}");
+  });
+  test("importLists - saves once per import", 1, function() {
+    var model = {
+      save : function () {
+        ok(true);
+      },
+      getList : function () {},
+      addList : function () {},
+      isItemNameUniqueInList : function () {
+        return true;
+      },
+      addItemToList : function () {}
+    }, view = {
+      clearImportErrorText : function () {}
+    };
+    randomChooser.createController(model, view).importLists("{\"1\":[\"1\"],\"2\":[\"2\"]}");
+  });
+  test("importLists - adds new list when it doesn't exist", 1, function() {
+    var model = {
+      save : function () {},
+      getList : function () {},
+      addList : function (name) {
+        equal(name, "name");
+      },
+      isItemNameUniqueInList : function () {},
+      addItemToList : function () {}
+    }, view = {
+      clearImportErrorText : function () {}
+    };
+    randomChooser.createController(model, view).importLists("{\"name\":[]}");
+  });
+  test("importLists - does not add list when it exists", 1, function() {
+    var list = [], model = {
+      save : function () {},
+      getList : function (name) {
+        equal(name, "name");
+        return list;
+      },
+      isItemNameUniqueInList : function () {},
+      addItemToList : function () {}
+    }, view = {
+      clearImportErrorText : function () {}
+    };
+    randomChooser.createController(model, view).importLists("{\"name\":[]}");
+  });
+  test("importLists - adds new item to new list when it doesn't exist", 2, function() {
+    var listFromAddListInvocation, model = {
+      save : function () {},
+      getList : function () {
+        return listFromAddListInvocation;
+      },
+      addList : function (name) {
+        listFromAddListInvocation = [];
+      },
+      isItemNameUniqueInList : function () {
+        return true;
+      },
+      addItemToList : function (list, itemName) {
+        equal(list, listFromAddListInvocation);
+        equal(itemName, "item");
+      }
+    }, view = {
+      clearImportErrorText : function () {}
+    };
+    randomChooser.createController(model, view).importLists("{\"name\":[\"item\"]}");
+  });
+  test("importLists - adds item to list when it exists", 2, function() {
+    var list = [], model = {
+      save : function () {},
+      getList : function (name) {
+        return list;
+      },
+      isItemNameUniqueInList : function () {
+        return true;
+      },
+      addItemToList : function (argumentList, itemName) {
+        equal(argumentList, list);
+        equal(itemName, 'itemName');
+      }
+    }, view = {
+      clearImportErrorText : function () {}
+    };
+    randomChooser.createController(model, view).importLists("{\"name\":[\"itemName\"]}");
+  });
+  test("importLists - doesn't add item if it's not unique", 1, function() {
+    var list = [], model = {
+      save : function () {},
+      getList : function (name) {
+        return list;
+      },
+      isItemNameUniqueInList : function () {
+        ok(true);
+        return false;
+      }
+    }, view = {
+      clearImportErrorText : function () {}
+    };
+    randomChooser.createController(model, view).importLists("{\"name\":[\"itemName\"]}");
+  });
+  test("importLists - undefined JSON warns user", 1, function() {
+    var model = {}, view = {
+      setImportErrorText : function (text) {
+        equal(text, "The text isn't in a proper JSON format, please correct this and try again.");
+      },
+      clearImportErrorText : function () {}
+    };
+    randomChooser.createController(model, view).importLists();
+  });
+  test("importLists - malformed JSON warns user", 1, function() {
+    var model = {}, view = {
+      setImportErrorText : function (text) {
+        equal(text, "The text isn't in a proper JSON format, please correct this and try again.");
+      },
+      clearImportErrorText : function () {}
+    };
+    randomChooser.createController(model, view).importLists("meh"); // meh is not well formed JSON
+  });
 });
   </script>
   

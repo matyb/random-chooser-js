@@ -141,6 +141,15 @@
     localStorage.setItem('random-chooser-lists', '{\"' + listName + '\":[\"' + itemName + '\"]}' );
     deepEqual( randomChooser.createModel(localStorage).getList(listName), [itemName] );
   });
+  test("getDbJSONString - returns from localstorage", 3, function() {
+    var localStorage = {
+        getItem : function (key) {
+          equal('random-chooser-lists', key);
+          return '{\"db contents\":[]}';
+        }
+    };
+    equal( randomChooser.createModel(localStorage).getDbJSONString(), "{\"db contents\":[]}");
+  });
 });
   </script>
   
