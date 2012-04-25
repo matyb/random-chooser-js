@@ -1,0 +1,121 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
+                    "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <title>Random Chooser Tests</title>
+  <link rel="stylesheet" href="qunit.css" type="text/css" media="screen" />
+  <script type="text/javascript" src="../js/jquery-1.6.4.min.js"></script>
+  <script type="text/javascript" src="../js/chooser.js"></script>
+  <script type="text/javascript" src="qunit.js"></script>
+  <!-- tests -->
+  <script type="text/javascript" src="localstorage-tests.js"></script>
+  <script type="text/javascript" src="model-tests.js"></script>
+  <script type="text/javascript" src="view-tests.js"></script>
+  <script type="text/javascript" src="controller-tests.js"></script>
+</head>
+<body>
+  <h1 id="qunit-header">Random Chooser Tests</h1>
+ <h2 id="qunit-banner"></h2>
+ <div id="qunit-testrunner-toolbar"></div>
+ <h2 id="qunit-userAgent"></h2>
+ <ol id="qunit-tests"></ol>
+ <div id="qunit-fixture">
+   <div data-role="page" id="firstPage">
+      <div data-role="header">
+        <h1>random chooser</h1>
+      </div>
+      <div data-role="content">
+        <a href="#addListPage"data-role="button" data-rel="dialog" data-transition="pop">Add List</a>
+        <br/> 
+        <ul data-role="listview" data-split-icon="delete" data-split-theme="d" id="lists">
+        </ul>
+      </div>
+    </div>
+    <div data-role="page" id="addListPage">
+      <div data-role="header">
+        <h1>add list</h1>
+      </div>
+      <div data-role="content">
+        <div data-role="fieldcontain" class="ui-hide-label">
+          <label for="listName">List Name:</label>
+          <input type="text" name="listName" id="listName" value="" placeholder="List Name"/>
+        </div>
+        <a id="addListOk" href="#firstPage" data-role="button" data-rel="back" data-theme="c">OK</a>
+      </div>
+    </div>
+    <div data-role="page" id="viewListPage">
+      <div data-role="header">
+        <h1 class="listNameLabel"></h1>
+      </div>
+      <div data-role="content">
+        <a href="#addItemPage" data-role="button" data-rel="dialog" data-transition="pop">Add Item</a>
+        <a href="#viewItemPage" data-role="button" data-rel="dialog" data-transition="pop" id="random">Select at Random</a>
+        <br/> 
+        <ul data-role="listview" data-split-icon="delete" data-split-theme="d" id="listItems">
+        </ul>
+      </div>
+    </div>
+    <div data-role="page" id="addItemPage">
+      <div data-role="header">
+        <h1>add item</h1>
+      </div>
+      <div data-role="content">
+        <div data-role="fieldcontain" class="ui-hide-label">
+          <label for="itemName">Item Name:</label>
+          <input type="text" name="itemName" id="itemName" value="" placeholder="Item Name"/>
+        </div>
+        <a id="addItemOk" href="#viewListPage" data-role="button" data-rel="back" data-theme="c">OK</a>
+      </div>
+    </div>
+    <div data-role="page" id="viewItemPage">
+      <div data-role="header">
+        <h1>selected</h1>
+      </div>
+      <div data-role="content">
+        <h1 id="itemNameLabel" align="center"></h1>
+        <a data-role="button" id="selectAnother">Select Another</a>
+      </div>
+    </div>
+    <div data-role="page" id="deletePage">
+      <div data-role="header">
+        <h1>really delete?</h1>
+      </div>
+      <div data-role="content">
+        <h1 id="deleteLabel" align="center"></h1>
+        <a data-role="button" id="delete">Yes</a>
+      </div>
+    </div>
+    <div data-role="page" id="importListsPage">
+      <div data-role="header">
+        <h1>import</h1>
+      </div>
+      <div data-role="content">
+        <div id="importTextPage">
+          <div data-role="fieldcontain" class="ui-hide-label">
+            <label for="listsData">Lists data:</label>
+            <textarea name="listsData" id="listsData" value="" placeholder="Lists Data"></textarea>
+          </div>
+        </div>
+        <div id="importErrorText" style="color: red;"></div>
+        <a href="#" data-role="button" id="import">OK</a>
+      </div>
+    </div>
+    <div data-role="page" id="exportListsPage">
+      <div data-role="header">
+        <h1>export</h1>
+      </div>
+      <div data-role="content">
+        <div id="exportTextPage">
+          <div data-role="fieldcontain" class="ui-hide-label">
+            <label for="exportListsData">Lists data:</label>
+            <textarea name="exportListsData" id="exportListsData" value=""></textarea>
+          </div>
+        </div>
+        <a href="#firstPage" data-role="button" id="export">Back</a>
+      </div>
+    </div>
+ </div>
+</body>
+</html>
+
+

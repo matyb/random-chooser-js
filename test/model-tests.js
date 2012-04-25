@@ -1,17 +1,5 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" 
-                    "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-  <title>Random Chooser Tests</title>
-  <link rel="stylesheet" href="qunit.css" type="text/css" media="screen" />
-  <script type="text/javascript" src="../js/json2.js"></script>
-  <script type="text/javascript" src="../js/jquery-1.6.4.min.js"></script>
-  <script type="text/javascript" src="../js/chooser.js"></script>
-  <script type="text/javascript" src="qunit.js"></script>
-
-  <script>
-  var $, deepEqual, equal, module, ok, QUnit, raises, randomChooser, test;
-  $(document).ready(function(){
+var $, deepEqual, equal, module, ok, QUnit, raises, randomChooser, test;
+$(document).ready(function(){
   var localStorage;
   QUnit.testStart = function(name) {
     localStorage =(function() {
@@ -155,15 +143,3 @@
     equal( randomChooser.createModel(localStorage).getDbJSONString(), "{\"db contents\":[]}");
   });
 });
-  </script>
-  
-</head>
-<body>
-  <h1 id="qunit-header">Random Chooser Tests</h1>
- <h2 id="qunit-banner"></h2>
- <div id="qunit-testrunner-toolbar"></div>
- <h2 id="qunit-userAgent"></h2>
- <ol id="qunit-tests"></ol>
- <div id="qunit-fixture"></div>
-</body>
-</html>
