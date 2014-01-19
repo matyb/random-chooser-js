@@ -1,3 +1,4 @@
+/*global module*/
 var $, equal, ok, randomChooser, test;
 $(document).ready(function(){
   module("Local Storage");

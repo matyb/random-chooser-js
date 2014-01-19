@@ -2,26 +2,50 @@
 	<head>
 		<title>Random Chooser</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<!-- @if NODE_ENV == 'DEVELOPMENT' -->
 		<link rel="stylesheet" href="./style/jquery.mobile-1.0.1.min.css" />
-		<script src="./js/json2.js"></script>
-		<script src="./js/jquery-1.6.4.min.js"></script>
-		<script src="./js/jquery.mobile-1.0.1.min.js"></script>
-		<script src="./js/chooser.js"></script>
+		<script src="../js/json2.js"></script>
+		<script src="../js/jquery-1.6.4.js"></script>
+		<script src="../js/jquery.mobile-1.0.1.js"></script>
+		<script src="../js/chooser.js"></script>
+		<!-- @endif -->
+		<!-- @if NODE_ENV == 'PRODUCTION' -->
+		<link rel="stylesheet" href="./style/jquery.mobile-1.0.1.min.css" />
+		<script src="./js/chooser.min.js"></script>
+		<!-- @endif -->
+		<!-- @if NODE_ENV == 'TEST' -->
+		<link rel="stylesheet" href="qunit.css" />
+		<script src="../js/jquery-1.6.4.js"></script>
+		<script src="../js/chooser.js"></script>
+		<script src="qunit.js"></script>
+		<script src="localstorage-tests.js"></script>
+		<script src="model-tests.js"></script>
+		<script src="view-tests.js"></script>
+		<script src="controller-tests.js"></script>
+		<!-- @endif -->
 	</head>
 	<body>
+	<!-- @if NODE_ENV == 'TEST' -->
+	<h1 id="qunit-header">Random Chooser Tests</h1>
+	<h2 id="qunit-banner"></h2>
+	<div id="qunit-testrunner-toolbar"></div>
+	<h2 id="qunit-userAgent"></h2>
+	<ol id="qunit-tests"></ol>
+	<div id="qunit-fixture">
+	<!-- @endif -->
 		<div data-role="page" id="firstPage">
 			<div data-role="header">
 				<h1>random chooser</h1>
 			</div>
 			<div data-role="content">
 			  <div data-role="controlgroup" data-type="horizontal" style="text-align: center">
-          <a href="#addListPage" data-role="button" data-rel="dialog" data-transition="pop">Add List</a>
-          <a href="#importListsPage" data-role="button" data-rel="dialog" data-transition="pop">Import</a>
-          <a href="#exportListsPage" data-role="button" data-rel="dialog" data-transition="pop">Export</a>
-        </div>
-				<br/>	
-				<ul data-role="listview" data-split-icon="delete" data-split-theme="d" id="lists">
-				</ul>
+				  <a href="#addListPage" data-role="button" data-rel="dialog" data-transition="pop">Add List</a>
+				  <a href="#importListsPage" data-role="button" data-rel="dialog" data-transition="pop">Import</a>
+				  <a href="#exportListsPage" data-role="button" data-rel="dialog" data-transition="pop">Export</a>
+			  </div>
+			  <br/>	
+			  <ul data-role="listview" data-split-icon="delete" data-split-theme="d" id="lists">
+			  </ul>
 			</div>
 		</div>
 		<div data-role="page" id="addListPage">
@@ -128,5 +152,8 @@
         <a href="#firstPage" data-role="button" id="export">Back</a>
       </div>
     </div>
+	<!-- @if NODE_ENV == 'TEST' -->
+	</div>
+	<!-- @endif -->
 	</body>
 </html>

@@ -1,18 +1,30 @@
 {
-  "name": "random-chooser",
+  "name": "chooser",
   "title": "Random Chooser",
   "description": "A random selection app, build up lists and pick randomly from them.",
   "repository": {
     "type": "git",
     "url": "git://github.com/matyb/random-chooser-js.git"
   },  
+  "homepage": "git://github.com/matyb/random-chooser-js.git",
+  "author": {
+	"name": "Mathew Bentley",
+	"github-user": "matyb" 
+  },
+  "licenses": [{"type": "MIT License"}],
   "version": "0.0.2",
   "dependencies": {
     "jQuery": "~1.7.3"
   },
   "devDependencies": {
     "grunt": "~0.4.0-rc8",
-    "grunt-contrib-qunit": ">=0.2.1"
+    "grunt-contrib-qunit": ">=0.2.1",
+	"grunt-contrib-copy": ">=0.5.0",
+	"grunt-contrib-jshint": ">=0.8.0",
+	"grunt-contrib-concat": ">=0.3.0",
+	"grunt-contrib-uglify": "=0.3.0",
+	"grunt-env": ">=0.1.0",
+	"grunt-preprocess": ">=0.1.0"
   },
   "scripts": {
     "test": "grunt test --verbose"

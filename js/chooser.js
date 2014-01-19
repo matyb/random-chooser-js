@@ -1,4 +1,4 @@
-var $, window, randomChooser = (function (win) {
+var $, randomChooser = (function (win) {
     'use strict';
     var controller;
     if (!$) {
@@ -149,7 +149,7 @@ var $, window, randomChooser = (function (win) {
             addToList(itemName, 'Delete Item', '#listItems', deleteClick, viewClick);
         }
         function redrawList(list, ul, addF) {
-            ul.empty();
+			ul.empty();
             ul.listview('refresh');
             $(list).each(function (index, element) {
                 addF(element.name, element.deleteClick, element.viewClick);
@@ -290,7 +290,8 @@ var $, window, randomChooser = (function (win) {
             drawSelectedList();
         };
         redrawFirstPage = function () {
-            view.redrawLists(createLineItemModels(model.getListNames(),
+            view.redrawLists(
+				createLineItemModels(model.getListNames(),
                 function (listName) { deleteList(listName); },
                 function (listName) { model.setSelectedListName(listName); }));
         };
@@ -430,14 +431,16 @@ var $, window, randomChooser = (function (win) {
         });
     });
     $('#importListsPage').live('pageinit', function () {
-        $('#import').addClass('ui-disabled');
-        $('#listsData').keyup(function (){
+		function textEntered () {
             if($('#listsData').val().trim().length === 0) {
                 $('#import').addClass('ui-disabled');
             }else{
                 $('#import').removeClass('ui-disabled');
             }
-        });
+        }
+        $('#import').addClass('ui-disabled');
+        $('#listsData').keyup(textEntered);
+		$('#listsData')[0].onpaste = textEntered;
         $('#import').click(function () {
             if (controller.importLists($('#listsData').val().trim())) {
                 controller.redrawFirstPage();

@@ -112,7 +112,7 @@ $(document).ready(function(){
     $('#listItems').constructor.prototype.listview = function(refresh) {};
     listNameLabel.text('');
     randomChooser.createView().drawList('1', []);
-    equal( listNameLabel.text(), 'list: 1');
+    ok($('.listNameLabel:contains("list: 1")'));
   });
   test("drawList - draws item for each name in array", 2, function() {
     var list = $('#listItems');
@@ -178,10 +178,10 @@ $(document).ready(function(){
     equal($('#importErrorText').text(), '');
     $('#importErrorText').constructor.prototype.show = function() {
       ok(true);
-    }
+    };
     $('#importErrorText').constructor.prototype.hide = function() {
       throw "should be shown";
-    }
+    };
     randomChooser.createView().setImportErrorText("some error");
     equal($('#importErrorText').text(), 'some error');
   });
@@ -189,10 +189,10 @@ $(document).ready(function(){
     $('#importErrorText').text('some error');
     $('#importErrorText').constructor.prototype.hide = function() {
       ok(true);
-    }
+    };
     $('#importErrorText').constructor.prototype.show = function() {
       throw "should be hidden";
-    }
+    };
     randomChooser.createView().clearImportErrorText();
     equal($('#importErrorText').text(), '');
   });
