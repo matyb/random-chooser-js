@@ -8,6 +8,6 @@
   },
   "scripts": {
     "test": "grunt test --verbose"
-  },
+  }
   
 }
