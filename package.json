@@ -3,7 +3,7 @@
     "jQuery": "~1.7.3"
   },
   "devDependencies": {
-    "grunt": "~0.4.1",
+    "grunt": "~0.4.0-rc8",
     "grunt-contrib-qunit": ">=0.2.1"
   }	
 }
