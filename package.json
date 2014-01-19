@@ -1,5 +1,5 @@
 {
-  "name": "Random Chooser",
+  "name": "random-chooser",
   "description": "A random selection app, build up lists and pick randomly from them.",
   "version": "0.2",
   "dependencies": {
