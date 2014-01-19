@@ -5,5 +5,6 @@ module.exports = function(grunt) {
         }
     });
     grunt.registerTask('test', 'qunit');
+    grunt.loadNpmTasks('grunt-contrib-qunit');
 };
 
