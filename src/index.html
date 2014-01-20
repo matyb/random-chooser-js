@@ -1,7 +1,9 @@
+<!DOCTYPE html>
 <html>
   <head>
     <title>Random Chooser</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
     <!-- @if NODE_ENV == 'DEVELOPMENT' -->
     <link rel="stylesheet" href="../src/style/jquery.mobile-1.0.1.min.css" />
     <script src="../src/js/json2.js"></script>
@@ -132,7 +134,7 @@
         <h1>selected</h1>
       </div>
       <div data-role="content">
-        <h1 id="itemNameLabel" align="center"></h1>
+        <h1 id="itemNameLabel" style="text-align:center"></h1>
         <a data-role="button" id="selectAnother">Select Another</a>
       </div>
     </div>
@@ -141,7 +143,7 @@
         <h1>really delete?</h1>
       </div>
       <div data-role="content">
-        <h1 id="deleteLabel" align="center"></h1>
+        <h1 id="deleteLabel" style="text-align:center"></h1>
         <a data-role="button" id="delete">Yes</a>
       </div>
     </div>
@@ -154,7 +156,7 @@
         <div id="importTextPage">
           <div data-role="fieldcontain" class="ui-hide-label">
             <label for="listsData">Lists data:</label>
-            <textarea name="listsData" id="listsData" value="" placeholder="Lists Data"></textarea>
+            <textarea name="listsData" id="listsData" placeholder="Lists Data"></textarea>
           </div>
         </div>
         <div id="importErrorText" style="color: red;"></div>
@@ -169,7 +171,7 @@
         <div id="exportTextPage">
           <div data-role="fieldcontain" class="ui-hide-label">
             <label for="exportListsData">Lists data:</label>
-            <textarea name="exportListsData" id="exportListsData" value=""></textarea>
+            <textarea name="exportListsData" id="exportListsData"></textarea>
           </div>
         </div>
         <a href="#firstPage" data-role="button" id="export">Back</a>
