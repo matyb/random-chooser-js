@@ -18,8 +18,10 @@ module.exports = function(grunt) {
 				dest: './dev/index.html'
 			},
 			prod: {
-				src: 'src/index.html',
-				dest: 'dist/index.html'
+				files : {
+					'dist/index.html' : 'src/index.html',
+					'dist/.htaccess'  : 'src/htaccess'
+				}
 			},
 			test: {
 				src: 'src/index.html',
