@@ -141,7 +141,7 @@ var $, randomChooser = (function (win) {
             deleteListAnchor = createDeleteAnchor(deleteAnchorText);
             deleteListAnchor[0].onclick = deleteClick;
             listViewAnchor[0].onclick = viewClick;
-            $(htmlListId).append($('<li/>', {}).append(listViewAnchor).append(deleteListAnchor));
+            $(htmlListId).append($('<li/>', {id: (htmlListId.substring(1) + "-"+viewAnchorText)}).append(listViewAnchor).append(deleteListAnchor));
         }
         function addList(listName, deleteClick, viewClick) {
             addToList(listName, 'Delete List', '#lists', deleteClick, viewClick, '#viewListPage');
@@ -181,6 +181,12 @@ var $, randomChooser = (function (win) {
             redrawLists : function (list) {
                 redrawList(list, $('#lists'), addList);
             },
+			deleteList : function (listName) {
+				$('#lists-'+listName).remove();
+			},
+			deleteItem : function (itemName) {
+				$('#listItems-'+itemName).remove();
+			},
             addList : addList,
             addItem : addItem,
             drawList : function (listName, list) {
@@ -279,7 +285,7 @@ var $, randomChooser = (function (win) {
         function deleteList(listName) {
             model.deleteList(listName);
             model.save();
-            redrawFirstPage();
+            view.deleteList(listName);
         }
         function enableDisableRandom() {
             view.setRandomDisabled(model.getSelectedListName() === undefined || model.getSelectedList().length <= 0);
@@ -288,7 +294,7 @@ var $, randomChooser = (function (win) {
             model.deleteItem(itemName);
             model.save();
             enableDisableRandom();
-            drawSelectedList();
+            view.deleteItem(itemName);
         };
         redrawFirstPage = function () {
             view.redrawLists(
