@@ -1,4 +1,4 @@
-﻿/*!
+﻿/*
  * jQuery JavaScript Library v1.6.4
  * http://jquery.com/
  *
@@ -13,6 +13,7 @@
  *
  * Date: Mon Sep 12 18:54:48 2011 -0400
  */
+ /*! jQuery v1.6.4 | (c) 2005, 2013 jQuery Foundation, Inc. | jquery.org/license */
 (function( window, undefined ) {
 
 // Use the correct document accordingly with window argument (sandbox)

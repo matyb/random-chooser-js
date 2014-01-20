@@ -75,7 +75,8 @@ module.exports = function(grunt) {
 				beautify: {
 					beautify: false,
 					"ascii_only": true
-				}
+				},
+				preserveComments: 'some'
 			},
 			dist: {
 				src: ['<banner:meta.banner>', '<%= concat.dist.dest %>'],

@@ -1,3 +1,4 @@
+/*! random chooser v0.0.4 | (c) 2011, 2013 Mathew Bentley | http://opensource.org/licenses/MIT */
 var $, randomChooser = (function (win) {
     'use strict';
     var controller;

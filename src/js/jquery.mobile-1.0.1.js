@@ -7,7 +7,7 @@
 * http://jquery.org/license
 *
 */
-/*!
+/*
  * jQuery UI Widget @VERSION
  *
  * Copyright 2010, AUTHORS.txt (http://jqueryui.com/about)
@@ -16,7 +16,7 @@
  *
  * http://docs.jquery.com/UI/Widget
  */
-
+ /*! jQuery Mobile v1.0.1 | (c) 2010, 2013 jQuery Foundation, Inc. | jquery.org/license */
 (function( $, undefined ) {
 
 // jQuery 1.4+
