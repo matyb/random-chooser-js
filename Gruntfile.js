@@ -14,25 +14,23 @@ module.exports = function(grunt) {
 		},
 		preprocess: {
 			dev: {
-				src: 'index.html',
+				src: 'src/index.html',
 				dest: './dev/index.html'
 			},
 			prod: {
-				src: 'index.html',
+				src: 'src/index.html',
 				dest: 'dist/index.html'
 			},
 			test: {
-				src: 'index.html',
+				src: 'src/index.html',
 				dest: 'test/tests.html'
 			}
 		},
 		copy: {
 			main: {
 				files: [
-					{expand: true, src: ['style/*.css'], dest: 'dist', filter: 'isFile'},
-					{expand: true, src: ['style/images/*'], dest: 'dist', filter: 'isFile'},
-					{expand: true, src: ['style/*.css'], dest: 'dev', filter: 'isFile'},
-					{expand: true, src: ['style/images/*'], dest: 'dev', filter: 'isFile'}
+					{expand: true, src: ['src/style/*.css', 'src/style/images/*', 'src/error/*'], dest: 'dist', filter: 'isFile'},
+					{expand: true, src: ['src/style/*.css', 'src/style/images/*', 'src/error/*'], dest: 'dev', filter: 'isFile'}
 				]
 			}
 		},
@@ -48,17 +46,16 @@ module.exports = function(grunt) {
 		},
 		concat: {
 			dist: {
-				src: ['<banner:meta.banner>', '<file_strip_banner:js/<%= pkg.name %>.js>', 
-					'js/jquery-1.6.4.js', 'js/jquery.mobile-1.0.1.js', 'js/json2.js', 
-					'js/chooser.js'],
-				dest: 'dist/js/<%= pkg.name %>.min.js'
+				src: [	'<banner:meta.banner>', 'src/js/jquery-1.6.4.js', 
+						'src/js/jquery.mobile-1.0.1.js', 'src/js/json2.js', 'src/js/chooser.js' ],
+				dest: 'dist/src/js/<%= pkg.name %>.min.js'
 			}
 		},
         qunit: {
             files: ['test/tests.html']
         },
 		jshint: {
-			files: ['Gruntfile.js', 'js/**/*.js', 'test/**/*.js'],
+			files: ['Gruntfile.js', 'src/js/**/*.js', 'test/**/*.js'],
 			options: {
 				curly: true,
 				eqeqeq: true,
