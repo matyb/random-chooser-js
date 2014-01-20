@@ -440,7 +440,7 @@ var $, randomChooser = (function (win) {
         }
         $('#import').addClass('ui-disabled');
         $('#listsData').keyup(textEntered);
-		$('#listsData')[0].onpaste = textEntered;
+		$('#importListsPage').live('input paste', textEntered);
         $('#import').click(function () {
             if (controller.importLists($('#listsData').val().trim())) {
                 controller.redrawFirstPage();
