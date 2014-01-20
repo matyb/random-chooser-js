@@ -11,32 +11,32 @@
     <!-- @endif -->
     <!-- @if NODE_ENV == 'PRODUCTION' -->
     <script type="text/javascript">
-		function deferLoadingJSandCSS() {
-			var cssSrc = "./src/style/jquery.mobile-1.0.1.min.css",
-				jsSrc = "./src/js/chooser.min.js",
-				cssId = 'css-file';
-			if (!document.getElementById(cssId))
-			{
-				var head  = document.getElementsByTagName('head')[0];
-				var link  = document.createElement('link');
-				link.id   = cssId;
-				link.rel  = 'stylesheet';
-				link.type = 'text/css';
-				link.href = "./src/style/jquery.mobile-1.0.1.min.css";
-				link.media = 'all';
-				head.appendChild(link);
-			}
-			var element = document.createElement("script");
-			element.src = jsSrc;
-			document.body.appendChild(element);
-		}
-		 if (window.addEventListener)
-			window.addEventListener("load", deferLoadingJSandCSS, false);
-		 else if (window.attachEvent)
-			window.attachEvent("onload", deferLoadingJSandCSS);
-		 else 
-			window.onload = deferLoadingJSandCSS;
-	</script>
+      function deferLoadingJSandCSS() {
+        var cssSrc = "./src/style/jquery.mobile-1.0.1.min.css",
+            jsSrc = "./src/js/chooser.min.js",
+            cssId = 'css-file',
+			element = document.createElement("script"),
+			head, link;
+        if (!document.getElementById(cssId)){
+          head = document.getElementsByTagName('head')[0];
+          link = document.createElement('link');
+          link.id   = cssId;
+          link.rel  = 'stylesheet';
+          link.type = 'text/css';
+          link.href = "./src/style/jquery.mobile-1.0.1.min.css";
+          link.media = 'all';
+          head.appendChild(link);
+        }
+        element.src = jsSrc;
+        document.body.appendChild(element);
+      }
+      if (window.addEventListener)
+        window.addEventListener("load", deferLoadingJSandCSS, false);
+      else if (window.attachEvent)
+        window.attachEvent("onload", deferLoadingJSandCSS);
+      else 
+        window.onload = deferLoadingJSandCSS;
+    </script>
     <!-- @endif -->
     <!-- @if NODE_ENV == 'TEST' -->
     <link rel="stylesheet" href="lib/qunit.css" />
