@@ -8,6 +8,9 @@ module.exports = function(grunt) {
 			prod: {
 				NODE_ENV : 'PRODUCTION'
 			},
+			phonegap: {
+				NODE_ENV : 'PHONEGAP'
+			},
 			test: {
 				NODE_ENV : 'TEST'
 			}
@@ -19,8 +22,13 @@ module.exports = function(grunt) {
 			},
 			prod: {
 				files : {
-					'dist/index.html' : 'src/index.html',
-					'dist/.htaccess'  : 'src/htaccess'
+					'dist/web/index.html' : 'src/index.html',
+					'dist/web/.htaccess'  : 'src/htaccess'
+				}
+			},
+			phonegap: {
+				files : {
+					'dist/phonegap/www/index.html' : 'src/index.html'
 				}
 			},
 			test: {
@@ -31,7 +39,10 @@ module.exports = function(grunt) {
 		copy: {
 			main: {
 				files: [
-					{expand: true, src: ['src/style/*.css', 'src/style/images/*', 'src/error/*'], dest: 'dist', filter: 'isFile'},
+					{cwd: 'src/phonegap', expand: true, src: ['**'], dest: 'dist/phonegap/', filter: 'isFile'},
+					{cwd: 'src/phonegap/.cordova', expand: true, src: ['**'], dest: 'dist/phonegap/.cordova', filter: 'isFile'},
+					{expand: true, src: ['src/style/*.css', 'src/style/images/*', 'src/error/*'], dest: 'dist/web', filter: 'isFile'},
+					{expand: true, flatten: true, cwd: 'src/style', src: ['**'], dest: 'dist/phonegap/www/css/', filter: 'isFile'},
 					{expand: true, src: ['src/style/*.css', 'src/style/images/*', 'src/error/*'], dest: 'dev', filter: 'isFile'}
 				]
 			}
@@ -47,10 +58,15 @@ module.exports = function(grunt) {
 				' */'
 		},
 		concat: {
-			dist: {
+			distweb: {
 				src: [	'<banner:meta.banner>', 'src/js/jquery-1.6.4.js', 
 						'src/js/jquery.mobile-1.0.1.js', 'src/js/json2.js', 'src/js/chooser.js' ],
-				dest: 'dist/src/js/<%= pkg.name %>.min.js'
+				dest: 'dist/web/src/js/<%= pkg.name %>.min.js'
+			},
+			distphonegap: {
+				src: [	'<banner:meta.banner>', 'src/js/jquery-1.6.4.js', 
+						'src/js/jquery.mobile-1.0.1.js', 'src/js/json2.js', 'src/js/chooser.js' ],
+				dest: 'dist/phonegap/www/js/<%= pkg.name %>.min.js'
 			}
 		},
         qunit: {
@@ -80,14 +96,18 @@ module.exports = function(grunt) {
 				},
 				preserveComments: 'some'
 			},
-			dist: {
-				src: ['<banner:meta.banner>', '<%= concat.dist.dest %>'],
-				dest: '<%= concat.dist.dest %>'
+			distweb: {
+				src: ['<banner:meta.banner>', '<%= concat.distweb.dest %>'],
+				dest: '<%= concat.distweb.dest %>'
+			},
+			distphonegap: {
+				src: ['<banner:meta.banner>', '<%= concat.distphonegap.dest %>'],
+				dest: '<%= concat.distphonegap.dest %>'
 			}
 		}
     });
 	grunt.registerTask('default', [	'jshint', 'env:test', 'preprocess:test', 'qunit', 'env:prod', 
-									'preprocess:prod', 'copy', 'concat', 'uglify', 'env:dev', 'preprocess:dev' ]);
+									'preprocess:prod', 'copy', 'concat', 'uglify', 'env:phonegap', 'preprocess:phonegap', 'env:dev', 'preprocess:dev' ]);
     grunt.registerTask('test', ['jshint', 'env:test', 'preprocess:test', 'qunit']);
 	grunt.loadNpmTasks('grunt-env');
 	grunt.loadNpmTasks('grunt-preprocess');

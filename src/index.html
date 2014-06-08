@@ -11,6 +11,11 @@
     <script src="../src/js/jquery.mobile-1.0.1.js"></script>
     <script src="../src/js/chooser.js"></script>
     <!-- @endif -->
+    <!-- @if NODE_ENV == 'PHONEGAP' -->
+    <link rel="stylesheet" href="css/jquery.mobile-1.0.1.min.css" />
+    <script src="phonegap.js"></script>
+    <script src="js/chooser.min.js"></script>
+    <!-- @endif -->
     <!-- @if NODE_ENV == 'PRODUCTION' -->
     <script type="text/javascript">
       function deferLoadingJSandCSS() {

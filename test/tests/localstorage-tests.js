@@ -3,8 +3,10 @@ var $, equal, ok, randomChooser, test;
 $(document).ready(function(){
   module("Local Storage");
   test("localStorage is not reimplemented when present", 1, function() {
+	//do nothing - prevents exception
     var localStorageMock = {
-      setItem : function (key, value) {} //do nothing - prevents exception
+      setItem : function (key, value) {},
+      getItem : function (key) {}
     };
     equal( randomChooser.createLocalStorage({
       localStorage : localStorageMock

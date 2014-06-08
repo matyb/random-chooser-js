@@ -1,18 +1,19 @@
 /*! random chooser v0.0.4 | (c) 2011, 2013 Mathew Bentley | http://opensource.org/licenses/MIT */
 var $, randomChooser = (function (win) {
     'use strict';
-    var controller;
+    var controller, dbGlobal = 'random-chooser-lists';
     if (!$) {
         throw 'jquery is required, please include it before this script';
     }
     function createLocalStorage(windo) {
-        var isLocalStorageSupported =  windo.localStorage !== undefined, localStorage;
+		var isLocalStorageSupported = windo.localStorage !== undefined, localStorage, initialized = false;
         if (isLocalStorageSupported) {
             try {
-                windo.localStorage.setItem('random-chooser-saveable-test', 'success');
+                initialized = windo.localStorage.getItem('random-chooser-init');
+                windo.localStorage.setItem('random-chooser-init', 'true');
                 // test mutability - safari throws in private mode
                 if (windo.localStorage.removeItem) { // not used by rest of application
-                    windo.localStorage.removeItem('random-chooser-saveable-test', 'success');
+                    windo.localStorage.removeItem('random-chooser-init', 'true');
                 }
                 localStorage = windo.localStorage;
             } catch (e) {
@@ -33,10 +34,14 @@ var $, randomChooser = (function (win) {
                 };
             }());
         }
+        if(!initialized){
+            localStorage.setItem(dbGlobal, JSON.stringify({"Coin Toss":           ["Heads","Tails"],
+                                                           "Rock Paper Scissors": ["Rock", "Paper", "Scissors"]}));
+        }
         return localStorage;
     }
     function createModel(db) {
-        var lists, selectedListName, dbGlobal = 'random-chooser-lists';
+        var lists, selectedListName;
         function checkListIsSelected() {
             var currentlySelectedList = lists[selectedListName];
             if (currentlySelectedList === undefined) {
