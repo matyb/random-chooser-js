@@ -37,12 +37,13 @@
         element.src = jsSrc;
         document.body.appendChild(element);
       }
-      if (window.addEventListener)
+      if (window.addEventListener){
         window.addEventListener("load", deferLoadingJSandCSS, false);
-      else if (window.attachEvent)
+      }else if (window.attachEvent){
         window.attachEvent("onload", deferLoadingJSandCSS);
-      else 
+      }else {
         window.onload = deferLoadingJSandCSS;
+      }
     </script>
     <!-- @endif -->
     <!-- @if NODE_ENV == 'TEST' -->

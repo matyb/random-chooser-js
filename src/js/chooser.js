@@ -10,11 +10,11 @@ var $, randomChooser = (function (win) {
         if (isLocalStorageSupported) {
             try {
                 initialized = windo.localStorage.getItem('random-chooser-init');
-                windo.localStorage.setItem('random-chooser-init', 'true');
                 // test mutability - safari throws in private mode
                 if (windo.localStorage.removeItem) { // not used by rest of application
-                    windo.localStorage.removeItem('random-chooser-init', 'true');
+                    windo.localStorage.removeItem('random-chooser-init');
                 }
+                windo.localStorage.setItem('random-chooser-init', 'true');
                 localStorage = windo.localStorage;
             } catch (e) {
                 isLocalStorageSupported = false;
@@ -186,11 +186,15 @@ var $, randomChooser = (function (win) {
             redrawLists : function (list) {
                 redrawList(list, $('#lists'), addList);
             },
+            deleteElement: function (elementId){
+                var child = document.getElementById(elementId); 
+				child.parentNode.removeChild(child);
+            },
 			deleteList : function (listName) {
-				$('#lists-'+listName).remove();
+				this.deleteElement("lists-"+listName);
 			},
 			deleteItem : function (itemName) {
-				$('#listItems-'+itemName).remove();
+				this.deleteElement('listItems-'+itemName);
 			},
             addList : addList,
             addItem : addItem,
