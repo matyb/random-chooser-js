@@ -5,8 +5,8 @@ module.exports = function(grunt) {
 			dev: {
 				NODE_ENV : 'DEVELOPMENT'
 			},
-			prod: {
-				NODE_ENV : 'PRODUCTION'
+			web: {
+				NODE_ENV : 'WEB'
 			},
 			phonegap: {
 				NODE_ENV : 'PHONEGAP'
@@ -20,7 +20,7 @@ module.exports = function(grunt) {
 				src: 'src/index.html',
 				dest: './dev/index.html'
 			},
-			prod: {
+			web: {
 				files : {
 					'dist/web/index.html' : 'src/index.html',
 					'dist/web/.htaccess'  : 'src/htaccess'
@@ -106,8 +106,8 @@ module.exports = function(grunt) {
 			}
 		}
     });
-    grunt.registerTask('default', [	'jshint', 'env:test', 'preprocess:test', 'qunit', 'env:prod', 
-									'preprocess:prod', 'copy:main', 'concat', 'uglify', 'copy:uglified',
+    grunt.registerTask('default', [	'jshint', 'env:test', 'preprocess:test', 'qunit', 'env:web', 
+									'preprocess:web', 'copy:main', 'concat', 'uglify', 'copy:uglified',
 									'env:phonegap', 'preprocess:phonegap', 'env:dev', 'preprocess:dev' ]);
     grunt.registerTask('test', ['jshint', 'env:test', 'preprocess:test', 'qunit']);
 	grunt.loadNpmTasks('grunt-env');
