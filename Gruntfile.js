@@ -18,7 +18,7 @@ module.exports = function(grunt) {
 		preprocess: {
 			dev: {
 				src: 'src/index.html',
-				dest: './dev/index.html'
+				dest: 'dev/index.html'
 			},
 			web: {
 				files : {
@@ -128,7 +128,7 @@ module.exports = function(grunt) {
     });
     
     grunt.registerTask('default', [	'build', 'asynch' ]);
-    grunt.registerTask('build', [ 'test', 'web', 'phonegap' ]);
+    grunt.registerTask('build', [ 'test', 'web', 'phonegap', 'dev' ]);
     grunt.registerTask('web', [	'env:web', 'preprocess:web', 'copy:main', 'concat', 'uglify' ]);
     grunt.registerTask('phonegap', [ 'copy:phonegap', 'env:phonegap', 'preprocess:phonegap' ]);
     grunt.registerTask('dev', [	'env:dev', 'preprocess:dev' ]);
