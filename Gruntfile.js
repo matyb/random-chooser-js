@@ -103,29 +103,47 @@ module.exports = function(grunt) {
 			distweb: {
 				src: ['<banner:meta.banner>', '<%= concat.distweb.dest %>'],
 				dest: '<%= concat.distweb.dest %>'
-			}
-		},
-		watch: {
-			test: {
-				files: ['src/js/**/*.js', 'test/**/*.js'],
-				tasks: ['test', 'web', 'dev', 'phonegap']
+            }
+        },
+        exec: {
+            startphonegapserver: 'cd dist && cd phonegap && phonegap serve && cd .. && cd ..'
+        },
+		watch : {
+			test : {
+				files : [ 'src/js/**/*.js', 'test/**/*.js' ],
+				tasks : [ 'test', 'web', 'dev', 'phonegap' ]
 			},
-			dev: {
-				files: ['src/style/*', 'src/index.html'],
-				tasks: ['dev', 'web', 'phonegap']
-			},			
-			build: {
-				files: ['Gruntfile.js'],
-				tasks: ['web']
+			dev : {
+				files : [ 'src/style/*', 'src/index.html' ],
+				tasks : [ 'dev', 'web', 'phonegap' ]
+			},
+			build : {
+				files : [ 'Gruntfile.js' ],
+				tasks : [ 'build' ]
+			},
+			livereload : {
+				options : {livereload : true}, files : [ 'dev/index.html' ]
 			}
 		}
     });
     
-    grunt.registerTask('default', [	'test', 'web', 'phonegap', 'watch' ]);
+    grunt.registerTask('default', [	'build', 'asynch' ]);
+    grunt.registerTask('build', [ 'test', 'web', 'phonegap' ]);
     grunt.registerTask('web', [	'env:web', 'preprocess:web', 'copy:main', 'concat', 'uglify' ]);
     grunt.registerTask('phonegap', [ 'copy:phonegap', 'env:phonegap', 'preprocess:phonegap' ]);
     grunt.registerTask('dev', [	'env:dev', 'preprocess:dev' ]);
     grunt.registerTask('test', ['jshint', 'env:test', 'preprocess:test', 'qunit' ]);
+    grunt.registerTask('asynch', '', function() {
+		var done = this.async();
+		setTimeout(function() {
+			grunt.task.run('exec:startphonegapserver');
+			done();
+		}, 1000);
+		setTimeout(function() {
+			grunt.task.run('watch');
+			done();
+		}, 1000);
+	});
     
 	grunt.loadNpmTasks('grunt-env');
 	grunt.loadNpmTasks('grunt-preprocess');
@@ -134,6 +152,7 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-uglify');
 	grunt.loadNpmTasks('grunt-contrib-concat');
 	grunt.loadNpmTasks('grunt-contrib-copy');
+	grunt.loadNpmTasks('grunt-exec');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 };
 
