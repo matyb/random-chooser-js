@@ -413,6 +413,8 @@ var $, randomChooser = (function (win) {
     // JQuery Mobile page events & handlers
     $('#firstPage').live('pageinit', function () {
         controller.redrawFirstPage();
+        $('#splash').css({'display':'none'});
+        $('#doneloading').css({'display':'block'});
     });
     $('#addListPage').live('pageinit', function () {
         controller.initAddListPage();

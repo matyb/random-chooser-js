@@ -47,7 +47,8 @@ module.exports = function(grunt) {
 			},
 			phonegap: {
 				files: [
-					{src: ['<%= concat.distweb.dest %>'], dest: 'dist/phonegap/www/js/<%= pkg.name %>.min.js'},
+					{src: ['<%= concat.js.dest %>'], dest: 'dist/phonegap/www/js/<%= pkg.name %>.min.js'},
+					{src: ['dist/web/src/style/<%= pkg.name %>.min.css'], dest: 'dist/phonegap/www/css/<%= pkg.name %>.min.css'},
 					{expand: true, cwd: 'src/phonegap/.cordova', src: ['**'], dest: 'dist/phonegap/.cordova'},
 					{expand: true, cwd: 'src/phonegap', src: ['**'], dest: 'dist/phonegap/'},
 					{expand: true, flatten: true, cwd: 'src/style', src: ['*.css'], dest: 'dist/phonegap/www/css/'},
@@ -67,7 +68,7 @@ module.exports = function(grunt) {
 				' */'
 		},
 		concat: {
-			distweb: {
+			js: {
 				src: [	'<banner:meta.banner>', 'src/js/jquery-1.6.4.js', 
 						'src/js/jquery.mobile-1.0.1.js', 'src/js/json2.js', 'src/js/chooser.js' ],
 				dest: 'dist/web/src/js/<%= pkg.name %>.min.js'
@@ -100,9 +101,17 @@ module.exports = function(grunt) {
 				},
 				preserveComments: 'some'
 			},
-			distweb: {
-				src: ['<banner:meta.banner>', '<%= concat.distweb.dest %>'],
-				dest: '<%= concat.distweb.dest %>'
+			js: {
+				src: ['<banner:meta.banner>', '<%= concat.js.dest %>'],
+				dest: '<%= concat.js.dest %>'
+            }
+        },
+        cssmin: {
+            combine: {
+              files: {
+                  'dist/web/src/style/<%= pkg.name %>.min.css': 
+                      [ '<banner:meta.banner>', 'src/style/chooser.css', 'src/style/jquery.mobile-1.0.1.min.css' ]
+              }
             }
         },
         exec: {
@@ -127,12 +136,12 @@ module.exports = function(grunt) {
 		}
     });
     
-    grunt.registerTask('default', [	'build', 'asynch' ]);
+    grunt.registerTask('default', [ 'build', 'asynch' ]);
     grunt.registerTask('build', [ 'test', 'web', 'phonegap', 'dev' ]);
-    grunt.registerTask('web', [	'env:web', 'preprocess:web', 'copy:main', 'concat', 'uglify' ]);
+    grunt.registerTask('web', [ 'env:web', 'preprocess:web', 'copy:main', 'concat', 'uglify', 'cssmin' ]);
     grunt.registerTask('phonegap', [ 'copy:phonegap', 'env:phonegap', 'preprocess:phonegap' ]);
-    grunt.registerTask('dev', [	'env:dev', 'preprocess:dev' ]);
-    grunt.registerTask('test', ['jshint', 'env:test', 'preprocess:test', 'qunit' ]);
+    grunt.registerTask('dev', [ 'env:dev', 'preprocess:dev' ]);
+    grunt.registerTask('test', [ 'jshint', 'env:test', 'preprocess:test', 'qunit' ]);
     grunt.registerTask('asynch', '', function() {
 		var done = this.async();
 		setTimeout(function() {
@@ -154,5 +163,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-copy');
 	grunt.loadNpmTasks('grunt-exec');
 	grunt.loadNpmTasks('grunt-contrib-watch');
+	grunt.loadNpmTasks('grunt-contrib-cssmin');
 };
 
