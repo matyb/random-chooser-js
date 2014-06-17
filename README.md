@@ -6,8 +6,8 @@ Heavily relies on Node/NPM/Grunt to build for web and phonegap, which can subseq
 
 Installation:
 * Install NodeJS
-* Download latest from github
-* Unarchive somewhere
-* cd to that directory
+* Install phonegap
+* clone latest from github
+* cd into the random-chooser-js directory
 * Issue the command 'npm install'
 * Lastly issue the command 'grunt'
