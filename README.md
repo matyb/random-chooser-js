@@ -15,6 +15,7 @@ Installation:
 
 Development:
 * After issuing grunt, the appserver and autoreload server start. At this point:
+
 1. tests are run
 2. the javascript is linted
 3. the app is built(js/css optimized and distinct html is produced for each target)
