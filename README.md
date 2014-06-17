@@ -23,7 +23,7 @@ After issuing grunt, the appserver and autoreload server start. At this point:
 4. target specific app is deployed to dev, dist/web and dist/phonegap
 5. dev/phonegap browsers auto reload to reflect changes.
 
-will occur to check the validity of the application. 1-4 will occur again anytime Gruntfile.js is edited or any javascript (including tests) is saved. 2-4 occur anytime markup or css change.
+will occur to check the validity of the application. 1-5 will occur again anytime Gruntfile.js is edited or any javascript (including tests) is saved. 2-5 occur anytime markup or css change.
 * **For rapid development** open random-chooser-js/dev/index.html in any desktop or mobile browsers you wish to test in.
 * **To deploy the mobile site** copy the contents of random-chooser-js/dist/web/ into your remote site where its expecting to find index.html and .htaccess
 * **To load in the phone gap mobile app** take note of the text that looks like:
