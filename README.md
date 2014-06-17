@@ -4,7 +4,7 @@ For when you wish to select an item at random from a list. Uses HTML5 local stor
 
 Heavily relies on Node/NPM/Grunt to build for web and phonegap, which can subsequently be built into mobile specific targets.
 
-Installation:
+__Installation:__
 * Install NodeJS
 * Install phonegap
 * clone latest from github
@@ -13,8 +13,9 @@ Installation:
 * Lastly issue the command 'grunt'
 * Install the phonegap mobile app on any mobile/tablet devices you wish to test with.
 
-Development:
-* After issuing grunt, the appserver and autoreload server start. At this point:
+__Development:__
+
+After issuing grunt, the appserver and autoreload server start. At this point:
 
 1. tests are run
 2. the javascript is linted
