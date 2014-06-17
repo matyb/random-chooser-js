@@ -118,16 +118,12 @@ module.exports = function(grunt) {
             startphonegapserver: 'cd dist && cd phonegap && phonegap serve && cd .. && cd ..'
         },
 		watch : {
-			test : {
-				files : [ 'src/js/**/*.js', 'test/**/*.js' ],
-				tasks : [ 'test', 'web', 'dev', 'phonegap' ]
-			},
 			dev : {
 				files : [ 'src/style/*', 'src/index.html' ],
 				tasks : [ 'dev', 'web', 'phonegap' ]
 			},
 			build : {
-				files : [ 'Gruntfile.js' ],
+				files : [ 'Gruntfile.js', 'src/js/**/*.js', 'test/**/*.js' ],
 				tasks : [ 'build' ]
 			},
 			livereload : {
