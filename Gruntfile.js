@@ -139,16 +139,15 @@ module.exports = function(grunt) {
     grunt.registerTask('dev', [ 'env:dev', 'preprocess:dev' ]);
     grunt.registerTask('test', [ 'jshint', 'env:test', 'preprocess:test', 'qunit' ]);
     grunt.registerTask('asynch', '', function() {
-		var done = this.async();
-		setTimeout(function() {
-			grunt.task.run('exec:startphonegapserver');
-			done();
-		}, 1000);
-		setTimeout(function() {
-			grunt.task.run('watch');
-			done();
-		}, 1000);
-	});
+        var asynchTasks = ['exec:startphonegapserver', 'watch'],
+            done = this.async();
+        asynchTasks.map(function(asynchTask){
+            setTimeout(function(){
+                grunt.task.run(asynchTask);
+                done();
+            }, 3000);
+        });
+    });
     
 	grunt.loadNpmTasks('grunt-env');
 	grunt.loadNpmTasks('grunt-preprocess');
