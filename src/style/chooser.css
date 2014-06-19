@@ -1,0 +1,12 @@
+#splash {
+	background-color: #000;
+	visibility: visible;
+	height: 100%;
+	width: 100%;
+	display: table;
+}
+#loadingtext {
+	display: table-cell;
+    vertical-align: middle;
+    color: #FFF;
+}
