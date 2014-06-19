@@ -149,7 +149,7 @@ module.exports = function(grunt) {
 		watch : {
 			dev : {
 				files : [ '<%= pkg.directories.srcstyle %>/*', '<%= pkg.directories.src %>/index.html' ],
-				tasks : [ 'dev', 'phonegap' ]
+				tasks : [ 'dev', 'web', 'phonegap' ]
 			},
 			build : {
 				files : [ 'Gruntfile.js', '<%= pkg.directories.srcjs %>/**', 'package.json' ],

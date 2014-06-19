@@ -6,7 +6,8 @@
 	display: table;
 }
 #loadingtext {
-	display: table-cell;
-    vertical-align: middle;
-    color: #FFF;
+	display: table-cell; 
+        vertical-align: middle;
+	text-align: center;
+        color: #FFF;
 }
