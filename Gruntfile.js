@@ -50,6 +50,8 @@ module.exports = function(grunt) {
             },
             web: {
                 files: [
+                    {expand: true, src: ['<%= pkg.directories.srcimages %>/*'], 
+                        dest: '<%= pkg.directories.distweb %>' },
                     {expand: true, cwd: '<%= pkg.directories.src %>', src: ['favicon.ico'], 
                         dest: '<%= pkg.directories.distweb %>'}
                 ]
