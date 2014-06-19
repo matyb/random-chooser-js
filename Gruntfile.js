@@ -1,5 +1,8 @@
 /*jslint node: true */
 module.exports = function(grunt) {
+    if(!grunt.option('target')){
+        grunt.option('target', 'android');
+    }
     grunt.initConfig({
 		env: {
 			dev: {
@@ -17,45 +20,66 @@ module.exports = function(grunt) {
 		},
 		preprocess: {
 			dev: {
-				src: 'src/index.html',
-				dest: 'dev/index.html'
+				src: '<%= pkg.directories.src %>/index.html',
+				dest: '<%= pkg.directories.dev %>/index.html'
 			},
 			web: {
 				files : {
-					'dist/web/index.html' : 'src/index.html',
-					'dist/web/.htaccess'  : 'src/htaccess'
+                    '<%= pkg.directories.distweb %>/index.html' : '<%= pkg.directories.src %>/index.html',
+                    '<%= pkg.directories.distweb %>/.htaccess'  : '<%= pkg.directories.src %>/htaccess'
 				}
 			},
 			phonegap: {
 				files : {
-					'dist/phonegap/www/index.html' : 'src/index.html'
+                    '<%= pkg.directories.phonegapwww %>/index.html' : '<%= pkg.directories.src %>/index.html'
 				}
 			},
 			test: {
-				src: 'src/index.html',
-				dest: 'test/tests.html'
+                src: '<%= pkg.directories.src %>/index.html',
+				dest: '<%= pkg.directories.test %>/tests.html'
 			}
 		},
 		copy: {
-			main: {
+            dev: {
+                files: [
+                    {expand: true, src: ['<%= pkg.directories.srcstyle %>/*.css', '<%= pkg.directories.srcimages %>/*', '<%= pkg.directories.srcstyle %>/*'], 
+                        dest: '<%= pkg.directories.dev %>' },
+                    {expand: true, cwd: '<%= pkg.directories.src %>', src: ['favicon.ico'], 
+                        dest: '<%= pkg.directories.dev %>'}
+                ]
+            },
+            web: {
+                files: [
+                    {expand: true, src: ['<%= pkg.directories.srcstyle %>/*.css', '<%= pkg.directories.srcimages %>/*', '<%= pkg.directories.srcerror %>/*'], 
+                        dest: '<%= pkg.directories.distweb %>' },
+                    {expand: true, cwd: '<%= pkg.directories.src %>', src: ['favicon.ico'], 
+                        dest: '<%= pkg.directories.distweb %>'}
+                ]
+            },
+            phonegap: {
 				files: [
-					{expand: true, src: ['src/style/*.css', 'src/style/images/*', 'src/error/*'], dest: 'dist/web'},
-					{expand: true, src: ['src/style/*.css', 'src/style/images/*', 'src/error/*'], dest: 'dev'},
-					{expand: true, cwd: 'src', src: ['favicon.ico'], dest: 'dist/web'},
-					{expand: true, cwd: 'src', src: ['favicon.ico'], dest: 'dev'}
+					{src: ['<%= concat.js.dest %>'], 
+                        dest: '<%= pkg.directories.phonegapwww %>/js/<%= pkg.name %>.min.js'},
+					{src: ['<%= pkg.directories.distweb %>/src/style/<%= pkg.name %>.min.css'], 
+                        dest: '<%= pkg.directories.phonegapwww %>/css/<%= pkg.name %>.min.css'},
+					{expand: true, cwd: '<%= pkg.directories.srcphonegap %>/.cordova', src: ['**'], 
+                        dest: '<%= pkg.directories.distphonegap %>/.cordova'},
+					{expand: true, cwd: '<%= pkg.directories.srcphonegap %>', src: ['**'], 
+                        dest: '<%= pkg.directories.distphonegap %>'},
+					{expand: true, flatten: true, cwd: '<%= pkg.directories.srcstyle %>', src: ['*.css'], 
+                        dest: '<%= pkg.directories.phonegapwww %>/css/'},
+					{expand: true, flatten: true, cwd: '<%= pkg.directories.srcimages %>', src: ['**'], 
+                        dest: '<%= pkg.directories.phonegapwww %>/css/images/'},
+					{expand: true, cwd: '<%= pkg.directories.src %>', src: ['favicon.ico'], 
+                        dest: '<%= pkg.directories.phonegapwww %>'},
 				]
 			},
-			phonegap: {
-				files: [
-					{src: ['<%= concat.js.dest %>'], dest: 'dist/phonegap/www/js/<%= pkg.name %>.min.js'},
-					{src: ['dist/web/src/style/<%= pkg.name %>.min.css'], dest: 'dist/phonegap/www/css/<%= pkg.name %>.min.css'},
-					{expand: true, cwd: 'src/phonegap/.cordova', src: ['**'], dest: 'dist/phonegap/.cordova'},
-					{expand: true, cwd: 'src/phonegap', src: ['**'], dest: 'dist/phonegap/'},
-					{expand: true, flatten: true, cwd: 'src/style', src: ['*.css'], dest: 'dist/phonegap/www/css/'},
-					{expand: true, flatten: true, cwd: 'src/style/images', src: ['**'], dest: 'dist/phonegap/www/css/images/'},
-					{expand: true, cwd: 'src', src: ['favicon.ico'], dest: 'dist/phonegap/www'},
-				]
-			}
+			android: {
+                files: [
+                    {expand: true, cwd: '<%= pkg.directories.phonegapandroid %>/ant-build', src: ['**'], 
+                        dest: '<%= pkg.directories.distandroid %>'}
+                ]
+            }
 		},
 		pkg: grunt.file.readJSON('package.json'),
 		meta: {
@@ -69,16 +93,18 @@ module.exports = function(grunt) {
 		},
 		concat: {
 			js: {
-				src: [	'<banner:meta.banner>', 'src/js/jquery-1.6.4.js', 
-						'src/js/jquery.mobile-1.0.1.js', 'src/js/json2.js', 'src/js/chooser.js' ],
-				dest: 'dist/web/src/js/<%= pkg.name %>.min.js'
+				src: [	'<banner:meta.banner>', '<%= pkg.directories.srcjs %>/jquery-1.6.4.js', 
+						'<%= pkg.directories.srcjs %>/jquery.mobile-1.0.1.js', 
+						'<%= pkg.directories.srcjs %>/json2.js', 
+						'<%= pkg.directories.srcjs %>/<%= pkg.name %>.js' ],
+				dest: '<%= pkg.directories.distweb %>/src/js/<%= pkg.name %>.min.js'
 			}
 		},
         qunit: {
-            files: ['test/tests.html']
+            files: ['<%= pkg.directories.test %>/tests.html']
         },
 		jshint: {
-			files: ['Gruntfile.js', 'src/js/**/*.js', 'test/**/*.js'],
+			files: ['Gruntfile.js', '<%= pkg.directories.srcjs %>/**/*.js', '<%= pkg.directories.test %>/**/*.js'],
 			options: {
 				curly: true,
 				eqeqeq: true,
@@ -109,35 +135,51 @@ module.exports = function(grunt) {
         cssmin: {
             combine: {
               files: {
-                  'dist/web/src/style/<%= pkg.name %>.min.css': 
-                      [ '<banner:meta.banner>', 'src/style/chooser.css', 'src/style/jquery.mobile-1.0.1.min.css' ]
+                  '<%= pkg.directories.distweb %>/src/style/<%= pkg.name %>.min.css': 
+                      [ '<banner:meta.banner>', 
+                        '<%= pkg.directories.srcstyle %>/<%= pkg.name %>.css', 
+                        '<%= pkg.directories.srcstyle %>/jquery.mobile-1.0.1.min.css' ]
               }
             }
         },
         exec: {
-            startphonegapserver: 'cd dist && cd phonegap && phonegap serve && cd .. && cd ..'
+            startphonegapserver: 'cd dist && cd phonegap && phonegap serve && cd .. && cd ..',
+            phonegapbuild: 'cd dist && cd phonegap && phonegap build ' + grunt.option('target') + ' && cd .. && cd ..'
         },
 		watch : {
 			dev : {
-				files : [ 'src/style/*', 'src/index.html' ],
-				tasks : [ 'dev', 'web', 'phonegap' ]
+				files : [ '<%= pkg.directories.srcstyle %>/*', '<%= pkg.directories.src %>/index.html' ],
+				tasks : [ 'dev', 'phonegap' ]
 			},
 			build : {
-				files : [ 'Gruntfile.js', 'src/js/**/*.js', 'test/**/*.js' ],
+				files : [ 'Gruntfile.js', '<%= pkg.directories.srcjs %>/**', 'package.json' ],
 				tasks : [ 'build' ]
 			},
+			test : {
+                files : [ '<%= pkg.directories.test %>/**' ],
+                tasks : [ 'test' ]
+            },
 			livereload : {
-				options : {livereload : true}, files : [ 'dev/index.html' ]
+				options : {livereload : true}, files : [ '<%= pkg.directories.dev %>/index.html' ]
 			}
+		},
+		clean: {
+            dev: ["<%= pkg.directories.dev %>"],
+            web: ["<%= pkg.directories.distweb %>"],
+            phonegap: ["<%= pkg.directories.distphonegap %>"],
+            test: ['<%= pkg.directories.test %>/tests.html'],
+            'phonegap-build': ['<%= pkg.directories.phonegapplatforms %>' + '/' + grunt.option('target')]
 		}
     });
     
-    grunt.registerTask('default', [ 'build', 'asynch' ]);
+    grunt.registerTask('default', [ 'clean:phonegap', 'build', 'asynch' ]);
+    grunt.registerTask('clear', [ 'clean' ]);
     grunt.registerTask('build', [ 'test', 'web', 'phonegap', 'dev' ]);
-    grunt.registerTask('web', [ 'env:web', 'preprocess:web', 'copy:main', 'concat', 'uglify', 'cssmin' ]);
+    grunt.registerTask('phonegap-build', [ 'clean:phonegap-build', 'exec:phonegapbuild', 'copy:' + grunt.option('target') ]);
+    grunt.registerTask('web', [ 'env:web', 'clean:web', 'preprocess:web', 'copy:web', 'concat', 'uglify', 'cssmin' ]);
     grunt.registerTask('phonegap', [ 'copy:phonegap', 'env:phonegap', 'preprocess:phonegap' ]);
-    grunt.registerTask('dev', [ 'env:dev', 'preprocess:dev' ]);
-    grunt.registerTask('test', [ 'jshint', 'env:test', 'preprocess:test', 'qunit' ]);
+    grunt.registerTask('dev', [ 'env:dev', 'clean:dev', 'preprocess:dev', 'copy:dev' ]);
+    grunt.registerTask('test', [ 'clean:test', 'jshint', 'env:test', 'preprocess:test', 'qunit' ]);
     grunt.registerTask('asynch', '', function() {
         var asynchTasks = ['exec:startphonegapserver', 'watch'],
             done = this.async();
@@ -159,5 +201,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-exec');
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-cssmin');
+	grunt.loadNpmTasks('grunt-contrib-clean');
 };
 

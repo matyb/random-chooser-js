@@ -19,6 +19,7 @@
   "devDependencies": {
     "grunt": "~0.4.0-rc8",
     "grunt-contrib-qunit": ">=0.2.1",
+    "grunt-contrib-clean": ">0.4.0",
 	"grunt-contrib-copy": ">=0.5.0",
 	"grunt-contrib-cssmin": ">=0.0.1",
 	"grunt-contrib-jshint": ">=0.8.0",
@@ -31,6 +32,22 @@
   },
   "scripts": {
     "test": "grunt test --verbose"
+  },
+  "directories": {
+    "src": "src",
+    "srcstyle": "src/style",
+    "srcjs": "src/js",
+    "srcimages": "src/style/images",
+    "srcerror": "src/error",
+    "srcphonegap": "src/phonegap",
+    "dist": "dist",
+    "distweb": "dist/web",
+    "distandroid": "dist/android",
+    "distphonegap": "dist/phonegap",
+    "phonegapwww": "dist/phonegap/www",
+    "phonegapplatforms": "dist/phonegap/platforms",
+    "phonegapandroid": "dist/phonegap/platforms/android",
+    "dev": "dev",
+    "test": "test"
   }
-  
 }
